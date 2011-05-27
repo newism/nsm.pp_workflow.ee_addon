@@ -31,31 +31,11 @@ class Nsm_publish_plus_ext
 
 	public $default_site_settings = array(
 		'enabled' => TRUE,
+		'next_review_fallback' => false,
 		'channels' => array(),
-		'member_groups' => array(),
-		'channel_data_map' => array(
-			'channel_id' => false,
-			'fields' => array(
-				'attr_1' => false,
-				'attr_2' => array(
-					'sub_0' => false,
-					'sub_1' => false,
-					'sub_2' => false,
-					'sub_3' => false,
-					'sub_4' => false,
-					'sub_5' => false,
-					'sub_6' => false,
-					'sub_7' => false,
-				),
-				'attr_3' => false
-			),
-			// key = field_id, value = col_id
-			'cols' => array()
-		),
-		'member_data_map' => array(
-			'attr_1' => false,
-			'attr_2' => false,
-			'attr_3' => false
+		'notifications' => array(
+			'subject' => '',
+			'message' => '',
 		)
 	);
 
@@ -180,11 +160,24 @@ class Nsm_publish_plus_ext
 			// Sometimes we may need to parse the settings
 			$data = $this->settings;
 		}
-
+		
 		$vars["data"] = $data;
-		$vars["channel_data_map"] = $this->_settings_form_channel_data_map($this->settings['channel_data_map']);
-		$vars["member_data_map"] = $this->_settings_form_member_data_map($this->settings['member_data_map']);
-
+		//$vars["channel_data_map"] = $this->_settings_form_channel_data_map($this->settings['channel_data_map']);
+		//$vars["member_data_map"] = $this->_settings_form_member_data_map($this->settings['member_data_map']);
+		
+		$get_channels = $EE->db->select('channel_id, channel_title')->order_by('channel_title')->get('channels');
+		foreach($get_channels->result() as $row){
+			$vars['channels'][$row->channel_id] = $row->channel_title;
+			
+			if(!isset($vars['data']['channels'][ $row->channel_id ])){
+				$vars['data']['channels'][ $row->channel_id ] = array(
+																		'enabled' => 0,
+																		'next_review' => 60,
+																		'recipients' => ''
+																	);
+			}
+		}
+		
 		// Return the view.
 		return $EE->load->view('extension/settings', $vars, TRUE);
 	}
@@ -295,7 +288,7 @@ class Nsm_publish_plus_ext
 		if(!$site_id) {
 			$site_id = SITE_ID;
 		}
-
+		/*
 		// Channel preferences (if required)
 		if(isset($this->default_settings["channels"])) {
 			$channels = $EE->channel_model->get_channels($site_id);
@@ -315,7 +308,7 @@ class Nsm_publish_plus_ext
 				}
 			}
 		}
-
+		*/
 		// return settings
 		return $default_settings;
 	}
@@ -481,6 +474,15 @@ class Nsm_publish_plus_ext
 			// no settings for the site
 			else {
 				$settings = $this->_buildDefaultSiteSettings(SITE_ID);
+				
+				$get_channels = $EE->db->select('channel_id, channel_title')->order_by('channel_title')->get('channels');
+				foreach($get_channels->result() as $row){
+					$settings['channels'][ $row->channel_id ] = array(
+																			'enabled' => 0,
+																			'next_review' => 60,
+																			'recipients' => ''
+																		);
+				}
 				$this->_saveSettings($settings);
 				log_message('info', __CLASS__ . " : " . __METHOD__ . ' creating new site settings');
 			}

@@ -25,9 +25,146 @@ class Nsm_publish_plus_mcp{
 	public function __construct() {
 		$this->EE =& get_instance();
 	}
+	
+	
+	public function review_entries()
+	{	
+		$EE =& get_instance();
+		$EE->lang->loadfile('nsm_publish_plus');
+		
+		if(!class_exists('Nsm_publish_plus_model')){
+			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		}
+		
+		$entries = Nsm_publish_plus_model::findByReviewNow();
+		if(!$entries){
+			// returned false, error
+			die($EE->lang->line('nsm_publish_plus_review_entries_db_select_error'));
+		}elseif(count($entries) == 0){
+			// returned no entries, tell user
+			die($EE->lang->line('nsm_publish_plus_review_entries_db_select_none'));
+		}
+		
+		$entry_ids = Nsm_publish_plus_model::getCollectionEntryIds($entries);
+		
+		$updates = Nsm_publish_plus_model::updateEntryState();
+		$updates = true;
+		if(!$updates){
+			die($EE->lang->line('nsm_publish_plus_review_entries_db_update_error'));
+		}
+		
+		$this->_processNotifications($entry_ids);
+		
+		die($EE->lang->line('nsm_publish_plus_review_entries_ok'));
+	}
+	
+	private function _returnEntries($entry_ids)
+	{
+		$entries = array();
+		
+		$EE =& get_instance();
+		$table_name = Nsm_publish_plus_model::getTableName();
+		// get the entries
+		$EE->db->from($table_name);
+		$EE->db->join('channel_titles', 'channel_titles.entry_id = '.$table_name.'.entry_id', 'left');
+		$EE->db->join('channels', 'channel_titles.channel_id = channels.channel_id', 'left');
+		$EE->db->where_in('id', $entry_ids);
+		$targeted_entries = $EE->db->get();
+		
+		return $targeted_entries->result_array();
+	}
+	
+	private function _processNotifications($entry_ids)
+	{
+		$EE =& get_instance();
+		// get extension settings
+		if(!class_exists('Nsm_publish_plus_ext')){
+			include(dirname(__FILE__).'/ext.nsm_publish_plus.php');
+		}
+		$nsm_pp_ext = new Nsm_publish_plus_ext();
+		$settings = $nsm_pp_ext->settings;
+		
+		$EE->load->library('email');
+		$EE->load->library('template', false, 'TMPL');
+		$this->EE->TMPL->site_ids = array('1');
+		
+		$entries = $this->_returnEntries($entry_ids);
+		foreach($entries as $entry_row){
+			$entry = $entry_row;
+			$channel_settings = $settings['channels'][$entry['channel_id']];
+			if(!isset($channel_settings['enabled']) || $channel_settings['enabled'] == 0){
+				continue;
+			}
+			$email_recipients = explode("\n", $channel_settings['recipients']);
+			$email_from = $settings['notifications']['from'];
+			$email_subject = $settings['notifications']['subject'];
+			$email_message = $settings['notifications']['message'];
+			
+			$entry['entry_url'] = $EE->functions->create_url($entry['comment_url'].$entry['url_title']);
+			$entry['cp_entry_url'] = $EE->config->item('cp_url').
+										'?D=cp&C=content_publish&M=entry_form'.
+										'&channel_id='.$entry['entry_id'].'&entry_id='.$entry['channel_id'];
+			
+			// reset template engine
+			$EE->TMPL->final_template = "";
+		
+			// reset email object
+			$EE->email->clear();
+		
+			$EE->email->from($email_from);
+			$EE->email->to($email_recipients);
+			
+			// set the e mail subject and parse variables
+			$email_subject = $EE->TMPL->parse_variables_row($email_subject, $entry);
+			$EE->email->subject($email_subject);
 
+			// set the email message body and parse variables
+			//$tagdata = $EE->TMPL->fetch_template($template['group'], $template['name'], FALSE);
+			$tagdata = $EE->TMPL->remove_ee_comments($email_message);
+			$tagdata = $EE->TMPL->convert_xml_declaration($email_message);
+			$tagdata = $EE->TMPL->parse_variables_row($tagdata, $entry);
+			$tagdata = $EE->functions->prep_conditionals($tagdata, $entry);
+			$EE->TMPL->parse($tagdata);
+			$email_message = $EE->TMPL->parse_globals($EE->TMPL->final_template);
+			$EE->email->message($email_message);
+			
+			// send the email
+			$EE->email->send();
+		}
+	}
+	
+	
+	
 	public function index(){
-		$out = $this->EE->load->view("module/index", array(), TRUE);
+		$EE =& get_instance();
+		$EE->lang->loadfile('nsm_publish_plus');
+		
+		$EE->load->helper('date');
+		
+		$vars = array('entries'=>false);
+		
+		if(!class_exists('Nsm_publish_plus_model')){
+			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		}
+		
+		$entries = Nsm_publish_plus_model::findStateReview();
+		if($entries){
+			$vars['entries'] = array();
+			$entry_ids = Nsm_publish_plus_model::getCollectionEntryIds($entries);
+			$entries = $this->_returnEntries($entry_ids);
+			foreach($entries as $entry_row){
+				$entry = $entry_row;
+				$entry['edit_date'] = strtotime($entry['edit_date']);
+				$entry['days_in_review'] = ceil(($entry['last_review_date'] - mktime()) / (24 * 60 * 60));
+				if($entry['days_in_review'] < 1){ $entry['days_in_review'] = "None"; }
+				$entry['days_since_edit'] = ceil(($entry['last_review_date'] - $entry['edit_date']) / (24 * 60 * 60));
+				if($entry['days_since_edit'] < 1){ $entry['days_since_edit'] = "None"; }
+				$entry['cp_entry_url'] = BASE.AMP.'C=content_publish'.AMP.'M=entry_form'.AMP.'channel_id='.$entry['channel_id'].AMP.'entry_id='.$entry['entry_id'];
+				$vars['entries'][] = $entry;
+			}
+		}
+		
+		$out = $this->EE->load->view("module/index", $vars, TRUE);
 		return $this->_renderLayout("index", $out);
 	}
 
@@ -62,5 +199,5 @@ class Nsm_publish_plus_mcp{
 		), $params);
 		return $base . http_build_query($params);
 	}
-
+	
 }

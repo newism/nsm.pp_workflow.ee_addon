@@ -51,21 +51,110 @@ $EE =& get_instance();
 		</table>
 	</div>
 
+	<div class="tg">
+		<h2>Default review settings</h2>
+		<table>
+			<tbody>
+				<tr>
+					<th scope="row">Days till review</th>
+					<td><input
+						type="text"
+						name="<?= $input_prefix."[next_review_fallback]"; ?>" 
+						value="<?= form_prep($data['next_review_fallback']); ?>"
+					/></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
 	<!-- 
 	===============================
 	Channel Settings / Mapping
 	===============================
 	-->
+	
+	<div class="tg">
+		<h2>Channel settings</h2>
+		<table>
+			<thead>
+				<tr>
+					<th scope="col" style="width:18px;"></th>
+					<th scope="col">Channel</th>
+					<th scope="col">Days till review</th>
+					<th scope="col">Email recipients</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach($channels as $channel_id => $channel_name) : ?>
+				<tr>
+					<td>
+						<input
+							type="hidden"
+							name="<?= $input_prefix."[channels][".$channel_id."][enabled]"; ?>" 
+							value="0" 
+						/>
+						<input
+							type="checkbox"
+							name="<?= $input_prefix."[channels][".$channel_id."][enabled]"; ?>" 
+							value="1" 
+							<?= ($data['channels'][$channel_id]['enabled'] == 1 ? ' checked="checked"' : ""); ?>
+						/>
+					</td>
+					<th scope="row"><?= $channel_name; ?></th>
+					<td>
+						<input
+							type="text"
+							name="<?= $input_prefix."[channels][".$channel_id."][next_review]"; ?>" 
+							value="<?= $data['channels'][$channel_id]['next_review']; ?>"
+						/>
+					</td>
+					<td>
+						<textarea
+							name="<?= $input_prefix."[channels][".$channel_id."][recipients]"; ?>" 
+							rows="3"
+							cols="30"
+						><?= form_prep($data['channels'][$channel_id]['recipients']); ?></textarea>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	
 
-	<?= $channel_data_map; ?>
-
-	<!-- 
-	===============================
-	Member Settings / Mapping
-	===============================
-	-->
-
-	<?= $member_data_map; ?>
+	<div class="tg">
+		<h2>Notification settings</h2>
+		<table>
+			<tbody>
+				<tr>
+					<th scope="row">Sender address</th>
+					<td><input
+						type="text"
+						name="<?= $input_prefix."[notifications][from]"; ?>" 
+						value="<?= form_prep($data['notifications']['from']); ?>"
+					/></td>
+				</tr>
+				<tr>
+					<th scope="row">Email subject</th>
+					<td><input
+						type="text"
+						name="<?= $input_prefix."[notifications][subject]"; ?>" 
+						value="<?= form_prep($data['notifications']['subject']); ?>"
+					/></td>
+				</tr>
+				<tr>
+					<th scope="row">Email message</th>
+					<td>
+						<textarea
+							name="<?= $input_prefix."[notifications][message]"; ?>" 
+							rows="3"
+							cols="30"
+						><?= form_prep($data['notifications']['message']); ?></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 	<!-- 
 	===============================

@@ -22,8 +22,12 @@ class Nsm_publish_plus_upd
 	private $has_publish_fields = true;
 	private $has_tabs = true;
 
-	private $actions = false;
-	private $models = false;
+	private $actions = array(
+		'Nsm_publish_plus_mcp::review_entries'
+	);
+	private $models = array(
+		'Nsm_publish_plus_model'
+	);
 
 	/**
 	 * Constructor
@@ -65,14 +69,14 @@ class Nsm_publish_plus_upd
 				));
 			}
 		}
-
+		
 		// Install the model tables
 		if($this->models) {
 			foreach($this->models as $model) {
-				$EE->load->model($model);
-
-				if(method_exists($EE->$model, "create_table")) {
-					$EE->$model->create_table();
+				echo $model;
+				require(dirname(__FILE__).'/models/'.strtolower($model).'.php');
+				if(method_exists("{$model}", "createTable")) {
+					call_user_func(array("{$model}", "createTable"));
 				}
 			}
 		}
@@ -142,7 +146,7 @@ class Nsm_publish_plus_upd
 		(
 			$this->addon_id => array
 			(
-				"field_1" => array(
+				"nsm_pp_workflow" => array(
 					'visible'		=> 'true',
 					'collapse'		=> 'false',
 					'htmlbuttons'	=> 'false',

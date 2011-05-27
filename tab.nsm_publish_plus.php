@@ -49,18 +49,107 @@ class Nsm_publish_plus_tab
 		// 	|| empty($ext->settings['channels'][$channel_id]['show_tab'])
 		// )
 		// 	return array();
-
-
+		
 		$EE =& get_instance();
 		$EE->lang->loadfile('nsm_publish_plus');
-
+		
+		if(!class_exists('Nsm_publish_plus_ext')){
+			include(dirname(__FILE__).'/ext.nsm_publish_plus.php');
+		}
+		$nsm_pp_ext = new Nsm_publish_plus_ext();
+		$settings = $nsm_pp_ext->settings;
+		
+		if(isset($settings['channels'][$channel_id])){
+			$days_till_next_review = intval($settings['channels'][$channel_id]['next_review']);
+		}else{
+			$days_till_next_review = intval($settings['next_review_fallback']);
+		}
+		
+		$EE->load->helper('date');
+		
+		if(!class_exists('Nsm_publish_plus_model')){
+			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		}
+		
+		// defaults
+		$default_data = array(
+			'state' => 'pending',
+			'days_till_review' => $days_till_next_review,
+			'allow' => array('est_now_review_date'),
+			'last_review_date' => 0,
+			'last_review_date_human' => "(No date recorded)",
+			'current_review_date' => 0,
+			'current_review_date_human' => "(No date set)",
+			'new_review_date' => 0,
+			'new_review_date_human' => "(No date set)",
+			'est_next_review_date' => 0,
+			'est_next_review_date_human' => "(Estimate unavailable)",
+			'est_now_review_date' => 0,
+			'est_now_review_date_human' => ''
+		);
+		
+		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($entry_id);
+		if(!$nsm_pp_model){
+			$est_now_review_date = now() + ((24 * 60 * 60) * $days_till_next_review);
+			$est_now_review_date_human = unix_to_human($est_now_review_date);
+			
+			$new_review_date = $est_now_review_date;
+			$new_review_date_human = $est_now_review_date_human;
+			
+			$data = array(
+				'new_review_date' => $new_review_date,
+				'new_review_date_human' => $new_review_date_human,
+				'est_now_review_date' => $est_now_review_date,
+				'est_now_review_date_human' => $est_now_review_date_human
+			);
+			
+		}else{
+			$last_review_date = $nsm_pp_model->last_review_date;
+			$last_review_date_human = unix_to_human($last_review_date);
+			
+			$current_review_date = $nsm_pp_model->next_review_date;
+			$current_review_date_human = unix_to_human($current_review_date);
+			
+			$est_next_review_date = $current_review_date + ((24 * 60 * 60) * $days_till_next_review);
+			$est_next_review_date_human = unix_to_human($est_next_review_date);
+			
+			$est_now_review_date = now() + ((24 * 60 * 60) * $days_till_next_review);
+			$est_now_review_date_human = unix_to_human($est_now_review_date);
+			
+			$data = array(
+				'state' => $nsm_pp_model->entry_state,
+				'allow' => array(
+								'current_review_date',
+								'est_next_review_date',
+								'est_now_review_date'
+							),
+				'current_review_date' => $current_review_date,
+				'current_review_date_human' => $current_review_date_human,
+				'new_review_date' => $current_review_date,
+				'new_review_date_human' => $current_review_date_human,
+				'est_next_review_date' => $est_next_review_date,
+				'est_next_review_date_human' => $est_next_review_date_human,
+				'est_now_review_date' => $est_now_review_date,
+				'est_now_review_date_human' => $est_now_review_date_human
+			);
+			
+			if($last_review_date > 0){
+				$data['allow'][] = 'last_review_date';
+				$data['last_review_date'] = $last_review_date;
+				$data['last_review_date_human'] = $last_review_date_human;
+			}
+			
+		}
+		
+		$data = array_merge($default_data, $data);
+		
 		$field_settings[] = array(
-			'field_id' => 'field_1', // This must match a key in Nsm_publish_plus_upd::tabs()
+			'field_id' => 'nsm_pp_workflow', // This must match a key in Nsm_publish_plus_upd::tabs()
 			'field_type' => 'nsm_publish_plus',
-			'field_label' => 'NSM Publish Plus Fieldtype',
+			'field_label' => $EE->lang->line('nsm_publish_plus_tab_review_date_label'),
 			'field_instructions' => '',
 			'field_required' => '',
-			'field_data' => '',
+			'field_data' => $data,
 			'field_list_items' => '',
 			'options' => '',
 			'selected' => '',
@@ -91,6 +180,45 @@ class Nsm_publish_plus_tab
 	 * @return void
 	 */
 	public function publish_data_db($params) {
+		$EE =& get_instance();
+		$EE->load->helper('date');
+		
+		if(!class_exists('Nsm_publish_plus_model')){
+			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		}
+		
+		$data = $params['mod_data']['nsm_pp_workflow'];
+		
+		
+		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($params['entry_id']);
+		// no existing entry? make one.
+		if(!$nsm_pp_model){
+			$model_data = array(
+				'entry_id' => $params['entry_id'],
+				'entry_state' => $data['state'],
+				'last_review_date' => 0,
+				'next_review_date' => 0,
+				'site_id' => $EE->config->item('site_id')
+			);
+			$nsm_pp_model = new Nsm_publish_plus_model($model_data);
+			$nsm_pp_model->add();
+		}
+		
+		$new_review_date = $data[ $data['use_date'] ];
+		if($data['use_date'] == 'new_review_date'){
+			$new_review_date = human_to_unix($new_review_date);
+		}
+		$nsm_pp_model->entry_state = $data['state'];
+		
+		if($data['use_date'] !== 'current_review_date'){
+			$nsm_pp_model->setNewReviewDate($new_review_date);
+		}
+		
+		if($nsm_pp_model->update()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	/**
@@ -100,5 +228,10 @@ class Nsm_publish_plus_tab
 	 * @return void
 	 */
 	public function publish_data_delete_db($entry_ids) {
+		if(!class_exists('Nsm_publish_plus_model')){
+			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		}
+		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($entry_id);
+		$nsm_pp_model->delete();
 	}
 }
