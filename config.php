@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Config file for NSM Publish Plus
+ * Config file for NSM Publish Plus: Workflow
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -11,13 +11,13 @@
  * @link			http://expressionengine-addons.com/nsm-example-addon
  */
 
-if(!defined('NSM_PUBLISH_PLUS_VERSION')) {
-	define('NSM_PUBLISH_PLUS_VERSION', '0.0.1');
-	define('NSM_PUBLISH_PLUS_NAME', 'NSM Publish Plus');
-	define('NSM_PUBLISH_PLUS_ADDON_ID', 'nsm_publish_plus');
+if(!defined('NSM_PP_WORKFLOW_VERSION')) {
+	define('NSM_PP_WORKFLOW_VERSION', '0.0.1');
+	define('NSM_PP_WORKFLOW_NAME', 'NSM Publish Plus: Workflow');
+	define('NSM_PP_WORKFLOW_ADDON_ID', 'nsm_pp_workflow');
 }
 
-$config['name'] 	= NSM_PUBLISH_PLUS_NAME;
-$config["version"] 	= NSM_PUBLISH_PLUS_VERSION;
+$config['name'] 	= NSM_PP_WORKFLOW_NAME;
+$config["version"] 	= NSM_PP_WORKFLOW_VERSION;
 
-$config['nsm_addon_updater']['versions_xml'] = 'http://github.com/newism/nsm.publish_plus.ee_addon/raw/master/versions.xml';
+$config['nsm_addon_updater']['versions_xml'] = 'http://github.com/newism/nsm.pp_workflow.ee_addon/raw/master/versions.xml';

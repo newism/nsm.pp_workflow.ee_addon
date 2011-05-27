@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Tab
+ * NSM Publish Plus: Workflow Tab
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,7 +14,7 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/modules.html#tab_file
  */
 
-class Nsm_publish_plus_tab
+class Nsm_pp_workflow_tab
 {
 	/**
 	 * This function creates the fields that will be displayed on the publish page. It must return $settings, a multidimensional associative array specifying the display settings and values associated with each of your custom fields.
@@ -40,10 +40,10 @@ class Nsm_publish_plus_tab
 	 */
 	public function publish_tabs($channel_id, $entry_id = FALSE) {
 		// Uncomment to hide tab.
-		// if(!class_exists('Nsm_publish_plus_ext'))
-		// 	require(PATH_THIRD . "nsm_publish_plus/ext.nsm_publish_plus.php");
+		// if(!class_exists('Nsm_pp_workflow_ext'))
+		// 	require(PATH_THIRD . "nsm_pp_workflow/ext.nsm_pp_workflow.php");
 		// 
-		// $ext = new Nsm_publish_plus_ext();
+		// $ext = new Nsm_pp_workflow_ext();
 		// if(
 		// 	! isset($ext->settings['channels'][$channel_id])
 		// 	|| empty($ext->settings['channels'][$channel_id]['show_tab'])
@@ -51,12 +51,12 @@ class Nsm_publish_plus_tab
 		// 	return array();
 		
 		$EE =& get_instance();
-		$EE->lang->loadfile('nsm_publish_plus');
+		$EE->lang->loadfile('nsm_pp_workflow');
 		
-		if(!class_exists('Nsm_publish_plus_ext')){
-			include(dirname(__FILE__).'/ext.nsm_publish_plus.php');
+		if(!class_exists('Nsm_pp_workflow_ext')){
+			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
 		}
-		$nsm_pp_ext = new Nsm_publish_plus_ext();
+		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$settings = $nsm_pp_ext->settings;
 		
 		if(isset($settings['channels'][$channel_id])){
@@ -67,8 +67,8 @@ class Nsm_publish_plus_tab
 		
 		$EE->load->helper('date');
 		
-		if(!class_exists('Nsm_publish_plus_model')){
-			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		if(!class_exists('Nsm_pp_workflow_model')){
+			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
 		// defaults
@@ -88,7 +88,7 @@ class Nsm_publish_plus_tab
 			'est_now_review_date_human' => ''
 		);
 		
-		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($entry_id);
+		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
 		if(!$nsm_pp_model){
 			$est_now_review_date = now() + ((24 * 60 * 60) * $days_till_next_review);
 			$est_now_review_date_human = unix_to_human($est_now_review_date);
@@ -144,9 +144,9 @@ class Nsm_publish_plus_tab
 		$data = array_merge($default_data, $data);
 		
 		$field_settings[] = array(
-			'field_id' => 'nsm_pp_workflow', // This must match a key in Nsm_publish_plus_upd::tabs()
-			'field_type' => 'nsm_publish_plus',
-			'field_label' => $EE->lang->line('nsm_publish_plus_tab_review_date_label'),
+			'field_id' => 'nsm_pp_workflow', // This must match a key in Nsm_pp_workflow_upd::tabs()
+			'field_type' => 'nsm_pp_workflow',
+			'field_label' => $EE->lang->line('nsm_pp_workflow_tab_review_date_label'),
 			'field_instructions' => '',
 			'field_required' => '',
 			'field_data' => $data,
@@ -183,14 +183,14 @@ class Nsm_publish_plus_tab
 		$EE =& get_instance();
 		$EE->load->helper('date');
 		
-		if(!class_exists('Nsm_publish_plus_model')){
-			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		if(!class_exists('Nsm_pp_workflow_model')){
+			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
 		$data = $params['mod_data']['nsm_pp_workflow'];
 		
 		
-		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($params['entry_id']);
+		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($params['entry_id']);
 		// no existing entry? make one.
 		if(!$nsm_pp_model){
 			$model_data = array(
@@ -200,7 +200,7 @@ class Nsm_publish_plus_tab
 				'next_review_date' => 0,
 				'site_id' => $EE->config->item('site_id')
 			);
-			$nsm_pp_model = new Nsm_publish_plus_model($model_data);
+			$nsm_pp_model = new Nsm_pp_workflow_model($model_data);
 			$nsm_pp_model->add();
 		}
 		
@@ -228,10 +228,10 @@ class Nsm_publish_plus_tab
 	 * @return void
 	 */
 	public function publish_data_delete_db($entry_ids) {
-		if(!class_exists('Nsm_publish_plus_model')){
-			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		if(!class_exists('Nsm_pp_workflow_model')){
+			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
-		$nsm_pp_model = Nsm_publish_plus_model::findByEntryId($entry_id);
+		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
 		$nsm_pp_model->delete();
 	}
 }

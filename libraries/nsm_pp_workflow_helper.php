@@ -1,22 +1,22 @@
 <?php
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Display
+ * NSM Publish Plus: Workflow Display
  * 
  * Usage:
  * 
  * $this->EE->load->library("{$this->addon_id}_addon", null, $this->addon_id);
  *
  * #  Add the custom field stylesheet to the header 
- * $this->EE->nsm_publish_plus_helper->addCSS('custom_field.css');
+ * $this->EE->nsm_pp_workflow_helper->addCSS('custom_field.css');
  * 
  * # Load the JS for the iframe
- * $this->EE->nsm_publish_plus_helper->addJS('custom_field.js');
- * $this->EE->nsm_publish_plus_helper->addJS('../lib/jquery.cookie.js');
+ * $this->EE->nsm_pp_workflow_helper->addJS('custom_field.js');
+ * $this->EE->nsm_pp_workflow_helper->addJS('../lib/jquery.cookie.js');
  * 
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -24,7 +24,7 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @link			http://expressionengine-addons.com/nsm-example-addon
  */
 
-class Nsm_publish_plus_helper{
+class Nsm_pp_workflow_helper{
 
 	/**
 	 * The addon ID

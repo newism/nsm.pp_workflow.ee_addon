@@ -6,7 +6,7 @@
  *
  * !! All text and textarea settings must use form_prep($value); !!
  *
- * @package Nsm_publish_plus
+ * @package Nsm_pp_workflow
  * @version 1.0.0
  * @author Leevi Graham <http://leevigraham.com.au>
  * @copyright Copyright (c) 2007-2010 Newism
@@ -45,7 +45,7 @@ $EE =& get_instance();
 			<tbody>
 				<tr>
 					<th scope="row">Enable?</th>
-					<td><?= $EE->nsm_publish_plus_helper->yesNoRadioGroup($input_prefix."[enabled]", $data["enabled"]); ?></td>
+					<td><?= $EE->nsm_pp_workflow_helper->yesNoRadioGroup($input_prefix."[enabled]", $data["enabled"]); ?></td>
 				</tr>
 			</tbody>
 		</table>

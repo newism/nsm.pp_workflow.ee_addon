@@ -1,11 +1,11 @@
 <?php if (! defined('BASEPATH')) die('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Tag methods
+ * NSM Publish Plus: Workflow Tag methods
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,9 +14,9 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/modules.html#control_panel_file
  */
 
-class Nsm_publish_plus {
+class Nsm_pp_workflow {
 
-	private $addon_id = NSM_PUBLISH_PLUS_ADDON_ID;
+	private $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 
 	/**
 	 * PHP5 constructor function.

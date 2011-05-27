@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Extension
+ * NSM Publish Plus: Workflow Extension
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,11 +14,11 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see 			http://expressionengine.com/public_beta/docs/development/extensions.html
  */
 
-class Nsm_publish_plus_ext
+class Nsm_pp_workflow_ext
 {
-	public $addon_id		= NSM_PUBLISH_PLUS_ADDON_ID;
-	public $version			= NSM_PUBLISH_PLUS_VERSION;
-	public $name			= NSM_PUBLISH_PLUS_NAME;
+	public $addon_id		= NSM_PP_WORKFLOW_ADDON_ID;
+	public $version			= NSM_PP_WORKFLOW_VERSION;
+	public $name			= NSM_PP_WORKFLOW_NAME;
 	public $description		= 'Example extension';
 	public $docs_url		= '';
 	public $settings_exist	= TRUE;
@@ -236,7 +236,7 @@ class Nsm_publish_plus_ext
 			}
 		}
 
-		$EE->nsm_publish_plus_helper->addJS($js, array("file"=>FALSE));
+		$EE->nsm_pp_workflow_helper->addJS($js, array("file"=>FALSE));
 		return $EE->load->view('extension/_settings_channel_data_map', $vars, TRUE);
 	}
 

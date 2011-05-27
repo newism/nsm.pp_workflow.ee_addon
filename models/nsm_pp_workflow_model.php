@@ -1,9 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * NSM Publish Plus Model 
+ * NSM Publish Plus: Workflow Model 
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -11,7 +11,7 @@
  * @link			http://expressionengine-addons.com/nsm-example-addon
  * @see				http://codeigniter.com/user_guide/general/models.html
  **/
-class Nsm_publish_plus_model {
+class Nsm_pp_workflow_model {
 	
 	public $id = false;
 	public $entry_id = false;
@@ -209,7 +209,7 @@ class Nsm_publish_plus_model {
 		$entries = array();
 		if(count($results) > 0){
 			foreach($results as $result){
-				return new Nsm_publish_plus_model($result);
+				return new Nsm_pp_workflow_model($result);
 			}
 		}else{
 			return false;
@@ -244,7 +244,7 @@ class Nsm_publish_plus_model {
 		$entries = array();
 		if(count($results) > 0){
 			foreach($results as $result){
-				$entries[] = new Nsm_publish_plus_model($result);
+				$entries[] = new Nsm_pp_workflow_model($result);
 			}
 		}
 		return $entries;
@@ -317,7 +317,7 @@ class Nsm_publish_plus_model {
 		$entry = array();
 		if(count($results) > 0){
 			foreach($results as $result){
-				return new Nsm_publish_plus_model($result);
+				return new Nsm_pp_workflow_model($result);
 			}
 		}else{
 			return false;
@@ -346,7 +346,7 @@ class Nsm_publish_plus_model {
 		$entries = array();
 		if(count($results) > 0){
 			foreach($results as $result){
-				$entries[] = new Nsm_publish_plus_model($result);
+				$entries[] = new Nsm_pp_workflow_model($result);
 			}
 		}
 		return $entries;
@@ -362,7 +362,7 @@ class Nsm_publish_plus_model {
 	 * 
 	 * @var string
 	 */
-	private static $table_name = "nsm_publish_plus_entries";
+	private static $table_name = "nsm_pp_workflow_entries";
 
 	/**
 	 * The model table fields

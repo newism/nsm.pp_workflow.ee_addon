@@ -1,13 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Plugin
+ * NSM Publish Plus: Workflow Plugin
  * 
  * Generally a module is better to use than a plugin if if it has not CP backend
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -22,15 +22,15 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @var array
  */
 $plugin_info = array(
-	'pi_name' => NSM_PUBLISH_PLUS_NAME,
-	'pi_version' => NSM_PUBLISH_PLUS_VERSION,
+	'pi_name' => NSM_PP_WORKFLOW_NAME,
+	'pi_version' => NSM_PP_WORKFLOW_VERSION,
 	'pi_author' => 'Leevi Graham',
 	'pi_author_url' => 'http://leevigraham.com/',
 	'pi_description' => 'Plugin description',
 	'pi_usage' => "Refer to the included README"
 );
 
-class Nsm_publish_plus{
+class Nsm_pp_workflow{
 
 	/**
 	 * The return string
@@ -39,9 +39,9 @@ class Nsm_publish_plus{
 	 */
 	var $return_data = "";
 
-	function Nsm_publish_plus() {
+	function Nsm_pp_workflow() {
 		$EE =& get_instance();
-		$this->return_data = "NSM Publish Plus Output";
+		$this->return_data = "NSM Publish Plus: Workflow Output";
 	}
 
 }

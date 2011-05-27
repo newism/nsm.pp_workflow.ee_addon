@@ -1,11 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
  * Install / Uninstall and updates the modules
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,19 +14,19 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/modules.html#update_file
  */
 
-class Nsm_publish_plus_upd
+class Nsm_pp_workflow_upd
 {
-	public  $version = NSM_PUBLISH_PLUS_VERSION;
-	public  $addon_id = NSM_PUBLISH_PLUS_ADDON_ID;
+	public  $version = NSM_PP_WORKFLOW_VERSION;
+	public  $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 	private $has_cp_backend = true;
 	private $has_publish_fields = true;
 	private $has_tabs = true;
 
 	private $actions = array(
-		'Nsm_publish_plus_mcp::review_entries'
+		'Nsm_pp_workflow_mcp::review_entries'
 	);
 	private $models = array(
-		'Nsm_publish_plus_model'
+		'Nsm_pp_workflow_model'
 	);
 
 	/**

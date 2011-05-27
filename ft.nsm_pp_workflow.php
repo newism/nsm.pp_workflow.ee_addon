@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Fieldtype
+ * NSM Publish Plus: Workflow Fieldtype
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,7 +14,7 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/fieldtypes.html
  */
 
-class Nsm_publish_plus_ft extends EE_Fieldtype
+class Nsm_pp_workflow_ft extends EE_Fieldtype
 {
 	/**
 	 * Field info - Required
@@ -23,11 +23,11 @@ class Nsm_publish_plus_ft extends EE_Fieldtype
 	 * @var array
 	 */
 	public $info = array(
-		'version'		=> NSM_PUBLISH_PLUS_VERSION,
-		'name'			=> NSM_PUBLISH_PLUS_NAME
+		'version'		=> NSM_PP_WORKFLOW_VERSION,
+		'name'			=> NSM_PP_WORKFLOW_NAME
 	);
 
-	public $addon_id		= NSM_PUBLISH_PLUS_ADDON_ID;
+	public $addon_id		= NSM_PP_WORKFLOW_ADDON_ID;
 
 	/**
 	 * The fieldtype global settings array
@@ -110,7 +110,7 @@ class Nsm_publish_plus_ft extends EE_Fieldtype
 
 		$vars = array(
 			'data' => $data,
-			'title' => 'Publish Plus',
+			'title' => 'Publish Plus: Workflow',
 			'input_prefix' => $input_name
 		);
 
@@ -118,7 +118,7 @@ class Nsm_publish_plus_ft extends EE_Fieldtype
 		// We need to to do this becuase this field may have been loaded by Matrix or Low varibales
 		return $this->EE->load->_ci_load(array(
 			'_ci_vars' => $vars,
-			'_ci_path' => PATH_THIRD . 'nsm_publish_plus/views/fieldtype/field.php',
+			'_ci_path' => PATH_THIRD . 'nsm_pp_workflow/views/fieldtype/field.php',
 			'_ci_return' => true
 		));
 	}

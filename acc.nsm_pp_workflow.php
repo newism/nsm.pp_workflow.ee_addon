@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus Accessory
+ * NSM Publish Plus: Workflow Accessory
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com> - Technical Director, Newism
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,12 +14,12 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/accessories.html
  */
 
-class Nsm_publish_plus_acc 
+class Nsm_pp_workflow_acc 
 {
-	public $id				= NSM_PUBLISH_PLUS_ADDON_ID;
-	public $version			= NSM_PUBLISH_PLUS_VERSION;
-	public $name			= NSM_PUBLISH_PLUS_NAME;
-	public $description		= 'Example accessory for NSM Publish Plus.';
+	public $id				= NSM_PP_WORKFLOW_ADDON_ID;
+	public $version			= NSM_PP_WORKFLOW_VERSION;
+	public $name			= NSM_PP_WORKFLOW_NAME;
+	public $description		= 'Example accessory for NSM Publish Plus: Workflow.';
 	public $sections		= array();
 
 	function set_sections() {

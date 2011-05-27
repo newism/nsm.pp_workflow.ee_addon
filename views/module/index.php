@@ -5,7 +5,7 @@
 	 *
 	 */
 /*form_open(
-		Nsm_publish_plus_mcp::_route(
+		Nsm_pp_workflow_mcp::_route(
 			'index',
 			array('param' => 'some_value'),
 			false

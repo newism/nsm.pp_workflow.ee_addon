@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require PATH_THIRD.'nsm_publish_plus/config.php';
+require PATH_THIRD.'nsm_pp_workflow/config.php';
 
 /**
- * NSM Publish Plus CP 
+ * NSM Publish Plus: Workflow CP 
  *
- * @package			NsmPublishPlus
+ * @package			NsmPublishPlusWorkflow
  * @version			0.0.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
@@ -14,9 +14,9 @@ require PATH_THIRD.'nsm_publish_plus/config.php';
  * @see				http://expressionengine.com/public_beta/docs/development/modules.html#control_panel_file
  */
 
-class Nsm_publish_plus_mcp{
+class Nsm_pp_workflow_mcp{
 
-	public static $addon_id = NSM_PUBLISH_PLUS_ADDON_ID;
+	public static $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 
 	private $pages = array(
 		"index"
@@ -30,32 +30,32 @@ class Nsm_publish_plus_mcp{
 	public function review_entries()
 	{	
 		$EE =& get_instance();
-		$EE->lang->loadfile('nsm_publish_plus');
+		$EE->lang->loadfile('nsm_pp_workflow');
 		
-		if(!class_exists('Nsm_publish_plus_model')){
-			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		if(!class_exists('Nsm_pp_workflow_model')){
+			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = Nsm_publish_plus_model::findByReviewNow();
+		$entries = Nsm_pp_workflow_model::findByReviewNow();
 		if(!$entries){
 			// returned false, error
-			die($EE->lang->line('nsm_publish_plus_review_entries_db_select_error'));
+			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
 		}elseif(count($entries) == 0){
 			// returned no entries, tell user
-			die($EE->lang->line('nsm_publish_plus_review_entries_db_select_none'));
+			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
 		}
 		
-		$entry_ids = Nsm_publish_plus_model::getCollectionEntryIds($entries);
+		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 		
-		$updates = Nsm_publish_plus_model::updateEntryState();
+		$updates = Nsm_pp_workflow_model::updateEntryState();
 		$updates = true;
 		if(!$updates){
-			die($EE->lang->line('nsm_publish_plus_review_entries_db_update_error'));
+			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
 		
 		$this->_processNotifications($entry_ids);
 		
-		die($EE->lang->line('nsm_publish_plus_review_entries_ok'));
+		die($EE->lang->line('nsm_pp_workflow_review_entries_ok'));
 	}
 	
 	private function _returnEntries($entry_ids)
@@ -63,7 +63,7 @@ class Nsm_publish_plus_mcp{
 		$entries = array();
 		
 		$EE =& get_instance();
-		$table_name = Nsm_publish_plus_model::getTableName();
+		$table_name = Nsm_pp_workflow_model::getTableName();
 		// get the entries
 		$EE->db->from($table_name);
 		$EE->db->join('channel_titles', 'channel_titles.entry_id = '.$table_name.'.entry_id', 'left');
@@ -78,10 +78,10 @@ class Nsm_publish_plus_mcp{
 	{
 		$EE =& get_instance();
 		// get extension settings
-		if(!class_exists('Nsm_publish_plus_ext')){
-			include(dirname(__FILE__).'/ext.nsm_publish_plus.php');
+		if(!class_exists('Nsm_pp_workflow_ext')){
+			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
 		}
-		$nsm_pp_ext = new Nsm_publish_plus_ext();
+		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$settings = $nsm_pp_ext->settings;
 		
 		$EE->load->library('email');
@@ -137,20 +137,20 @@ class Nsm_publish_plus_mcp{
 	
 	public function index(){
 		$EE =& get_instance();
-		$EE->lang->loadfile('nsm_publish_plus');
+		$EE->lang->loadfile('nsm_pp_workflow');
 		
 		$EE->load->helper('date');
 		
 		$vars = array('entries'=>false);
 		
-		if(!class_exists('Nsm_publish_plus_model')){
-			include(dirname(__FILE__).'/models/nsm_publish_plus_model.php');
+		if(!class_exists('Nsm_pp_workflow_model')){
+			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = Nsm_publish_plus_model::findStateReview();
+		$entries = Nsm_pp_workflow_model::findStateReview();
 		if($entries){
 			$vars['entries'] = array();
-			$entry_ids = Nsm_publish_plus_model::getCollectionEntryIds($entries);
+			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 			$entries = $this->_returnEntries($entry_ids);
 			foreach($entries as $entry_row){
 				$entry = $entry_row;
@@ -194,7 +194,7 @@ class Nsm_publish_plus_mcp{
 		$params = array_merge(array(
 			'C' =>  'addons_modules',
 			'M' => 'show_module_cp',
-			'module' => NSM_PUBLISH_PLUS_ADDON_ID,
+			'module' => NSM_PP_WORKFLOW_ADDON_ID,
 			'method' => $method
 		), $params);
 		return $base . http_build_query($params);
