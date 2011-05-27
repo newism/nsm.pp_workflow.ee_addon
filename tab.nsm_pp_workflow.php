@@ -195,6 +195,7 @@ class Nsm_pp_workflow_tab
 		if(!$nsm_pp_model){
 			$model_data = array(
 				'entry_id' => $params['entry_id'],
+				'channel_id' => $params['meta']['channel_id'],
 				'entry_state' => $data['state'],
 				'last_review_date' => 0,
 				'next_review_date' => 0,
@@ -208,6 +209,8 @@ class Nsm_pp_workflow_tab
 		if($data['use_date'] == 'new_review_date'){
 			$new_review_date = human_to_unix($new_review_date);
 		}
+		
+		$nsm_pp_model->channel_id = $params['meta']['channel_id'];
 		$nsm_pp_model->entry_state = $data['state'];
 		
 		if($data['use_date'] !== 'current_review_date'){

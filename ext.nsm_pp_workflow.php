@@ -34,6 +34,8 @@ class Nsm_pp_workflow_ext
 		'next_review_fallback' => false,
 		'channels' => array(),
 		'notifications' => array(
+			'from_name' => '',
+			'from_email' => '',
 			'subject' => '',
 			'message' => '',
 		)

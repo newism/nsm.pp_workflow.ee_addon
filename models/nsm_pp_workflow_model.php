@@ -15,6 +15,7 @@ class Nsm_pp_workflow_model {
 	
 	public $id = false;
 	public $entry_id = false;
+	public $channel_id = false;
 	public $entry_state = false;
 	public $last_review_date = false;
 	public $next_review_date = false;
@@ -204,6 +205,7 @@ class Nsm_pp_workflow_model {
 		$EE =& get_instance();
 		$EE->db->from(self::$table_name);
 		$EE->db->where('entry_id', $entry_id);
+		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$get_entries = $EE->db->get();
 		$results = $get_entries->result_array();
 		$entries = array();
@@ -229,13 +231,15 @@ class Nsm_pp_workflow_model {
 	 * @param int $field_id Field ID
 	 * @return array Collection of configuration presets
 	 **/
-	public static function findByReviewNow()
+	public static function findByReviewNow($channel_ids)
 	{
 		$EE =& get_instance();
 		$EE->load->helper('date');
 		
 		$EE->db->where('next_review_date < '.now());
+		$EE->db->where_in('channel_id', $channel_ids);
 		$EE->db->where('entry_state != "review"');
+		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$get_entries = $EE->db->get(self::$table_name);
 		if(!$get_entries){
 			return false;
@@ -281,13 +285,15 @@ class Nsm_pp_workflow_model {
 	 * @param int $field_id Field ID
 	 * @return array Collection of configuration presets
 	 **/
-	public static function updateEntryState()
+	public static function updateEntryState($channel_ids)
 	{
 		$EE =& get_instance();
 		$EE->load->helper('date');
 		
 		$EE->db->where('`next_review_date` < '.now());
+		$EE->db->where_in('channel_id', $channel_ids);
 		$EE->db->where('entry_state != "review"');
+		$EE->db->where('site_id', $EE->config->item('site_id'));
 		if( $EE->db->update(self::$table_name, array('entry_state'=>'review')) ){
 			return true;
 		}else{
@@ -311,6 +317,7 @@ class Nsm_pp_workflow_model {
 		$EE =& get_instance();
 		$EE->db->from(self::$table_name);
 		$EE->db->where('id', $id);
+		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$EE->db->limit(1);
 		$get_entry = $EE->db->get();
 		$results = $get_entry->result_array();
@@ -336,11 +343,13 @@ class Nsm_pp_workflow_model {
 	 * @param int $field_id Field ID
 	 * @return array Collection of configuration presets
 	 **/
-	public static function findStateReview()
+	public static function findStateReview($channel_ids)
 	{
 		$EE =& get_instance();
 		$EE->db->from(self::$table_name);
 		$EE->db->where('entry_state = "review"');
+		$EE->db->where_in('channel_id', $channel_ids);
+		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$get_entries = $EE->db->get();
 		$results = $get_entries->result_array();
 		$entries = array();
@@ -372,6 +381,7 @@ class Nsm_pp_workflow_model {
 	private static $table_fields = array(
 		"id" 				=> array('type' => 'INT', 'constraint' => '10', 'auto_increment' => TRUE, 'unsigned' => TRUE),
 		"entry_id" 			=> array('type' => 'INT', 'constraint' => '10'),
+		"channel_id" 		=> array('type' => 'INT', 'constraint' => '10'),
 		"entry_state" 		=> array('type' => 'VARCHAR', 'constraint' => '10'),
 		"last_review_date" 	=> array('type' => 'INT', 'constraint' => '10'),
 		"next_review_date" 	=> array('type' => 'INT', 'constraint' => '10'),

@@ -24,6 +24,13 @@ class Nsm_pp_workflow_mcp{
 
 	public function __construct() {
 		$this->EE =& get_instance();
+		
+		// get extension settings
+		if(!class_exists('Nsm_pp_workflow_ext')){
+			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
+		}
+		$nsm_pp_ext = new Nsm_pp_workflow_ext();
+		$this->settings = $nsm_pp_ext->settings;
 	}
 	
 	
@@ -36,7 +43,18 @@ class Nsm_pp_workflow_mcp{
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = Nsm_pp_workflow_model::findByReviewNow();
+		if(!$this->settings){
+			// get extension settings
+			if(!class_exists('Nsm_pp_workflow_ext')){
+				include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
+			}
+			$nsm_pp_ext = new Nsm_pp_workflow_ext();
+			$this->settings = $nsm_pp_ext->settings;
+		}
+		
+		$channel_ids = $this->_returnChannelIDs($this->settings);
+		
+		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
 		if(!$entries){
 			// returned false, error
 			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
@@ -47,7 +65,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 		
-		$updates = Nsm_pp_workflow_model::updateEntryState();
+		$updates = Nsm_pp_workflow_model::updateEntryState($channel_ids);
 		$updates = true;
 		if(!$updates){
 			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
@@ -56,6 +74,18 @@ class Nsm_pp_workflow_mcp{
 		$this->_processNotifications($entry_ids);
 		
 		die($EE->lang->line('nsm_pp_workflow_review_entries_ok'));
+	}
+	
+	private function _returnChannelIDs($settings)
+	{
+		$channel_ids = array();
+		foreach($settings['channels'] as $channel_id => $channel_settings){
+			if($channel_settings['enabled'] == 1){
+				$channel_ids[$channel_id] = 1;
+			}
+		}
+		$channel_ids = array_keys($channel_ids);
+		return $channel_ids;
 	}
 	
 	private function _returnEntries($entry_ids)
@@ -77,12 +107,6 @@ class Nsm_pp_workflow_mcp{
 	private function _processNotifications($entry_ids)
 	{
 		$EE =& get_instance();
-		// get extension settings
-		if(!class_exists('Nsm_pp_workflow_ext')){
-			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
-		}
-		$nsm_pp_ext = new Nsm_pp_workflow_ext();
-		$settings = $nsm_pp_ext->settings;
 		
 		$EE->load->library('email');
 		$EE->load->library('template', false, 'TMPL');
@@ -91,14 +115,14 @@ class Nsm_pp_workflow_mcp{
 		$entries = $this->_returnEntries($entry_ids);
 		foreach($entries as $entry_row){
 			$entry = $entry_row;
-			$channel_settings = $settings['channels'][$entry['channel_id']];
+			$channel_settings = $this->settings['channels'][$entry['channel_id']];
 			if(!isset($channel_settings['enabled']) || $channel_settings['enabled'] == 0){
 				continue;
 			}
 			$email_recipients = explode("\n", $channel_settings['recipients']);
-			$email_from = $settings['notifications']['from'];
-			$email_subject = $settings['notifications']['subject'];
-			$email_message = $settings['notifications']['message'];
+			$email_from = $this->settings['notifications']['from'];
+			$email_subject = $this->settings['notifications']['subject'];
+			$email_message = $this->settings['notifications']['message'];
 			
 			$entry['entry_url'] = $EE->functions->create_url($entry['comment_url'].$entry['url_title']);
 			$entry['cp_entry_url'] = $EE->config->item('cp_url').
@@ -138,8 +162,18 @@ class Nsm_pp_workflow_mcp{
 	public function index(){
 		$EE =& get_instance();
 		$EE->lang->loadfile('nsm_pp_workflow');
-		
 		$EE->load->helper('date');
+		
+		if(!$this->settings){
+			// get extension settings
+			if(!class_exists('Nsm_pp_workflow_ext')){
+				include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
+			}
+			$nsm_pp_ext = new Nsm_pp_workflow_ext();
+			$this->settings = $nsm_pp_ext->settings;
+		}
+		
+		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
 		$vars = array('entries'=>false);
 		
@@ -147,7 +181,7 @@ class Nsm_pp_workflow_mcp{
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = Nsm_pp_workflow_model::findStateReview();
+		$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
 		if($entries){
 			$vars['entries'] = array();
 			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
