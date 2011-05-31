@@ -31,7 +31,7 @@ class Nsm_pp_workflow_ext
 
 	public $default_site_settings = array(
 		'enabled' => TRUE,
-		'next_review_fallback' => false,
+		'next_review_fallback' => 30,
 		'channels' => array(),
 		'notifications' => array(
 			'from_name' => '',
@@ -41,14 +41,6 @@ class Nsm_pp_workflow_ext
 		)
 	);
 
-	private $channel_data_map_config = array(
-		'fields' => array(
-			'attr_2' => array(
-				'matrix' => true,
-				'field_selector' => 'sub_0'
-			)
-		)
-	);
 
 	public $default_channel_settings = array();
 	public $default_member_group_settings = array();

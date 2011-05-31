@@ -241,6 +241,9 @@ class Nsm_pp_workflow_model {
 		$EE->db->where('entry_state != "review"');
 		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$get_entries = $EE->db->get(self::$table_name);
+		if($get_entries->num_rows() == 0){
+			return array();
+		}
 		if(!$get_entries){
 			return false;
 		}

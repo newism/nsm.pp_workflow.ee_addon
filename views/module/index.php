@@ -24,45 +24,44 @@
 
 <div class="mor">
 	<div class="tg">
-		<h2>Entries to be reviewed</h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_heading') ?></h2>
 		<div class="alert info">
-			(CONTENT TO BE ADDED)
+			<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_intro') ?>
 		</div>
-		<table class="data">
+		<table class="data col-sortable NSM_Stripeable">
+			<col class="id" style="width:90px;"/>
 			<thead>
 				<tr>
-					<th scope="col">Entry ID</th>
-					<th scope="col">Title</th>
-					<th scope="col">Channel</th>
-					<th scope="col">Status</th>
-					<th scope="col">State</th>
-					<th scope="col">Last edited</th>
-					<th scope="col">Review date</th>
-					<!--<th scope="col">Days unaltered</th>
-					<th scope="col">Days in review</th>-->
+					<th scope="col" class="id"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_entry_id') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_title') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_channel') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_status') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_state') ?></th>
+					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_last_edited') ?></th>
+					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_review_date') ?></th>
 				</tr>
 			</thead>
 			<tbody>
 		<?php if(!$entries): ?>
 			<tr>
-				<td colspan="7" class="alert">No entries ready for review.</td>
+				<td colspan="7" class="alert">
+					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_no_results') ?>
+				</td>
 			</tr>
 		<?php else: ?>
 			<?php foreach($entries as $entry) : ?>
 				<tr>
-					<th scope="row"><?= $entry['entry_id'] ?></th>
-					<td>
+					<td><?= $entry['entry_id'] ?></td>
+					<th scope="row">
 						<a href="<?= $entry['cp_entry_url'] ?>">
 							<?= $entry['title'] ?>
 						</a>
-					</td>
+					</th>
 					<td><?= $entry['channel_title'] ?></td>
 					<td><?= $entry['status'] ?></td>
 					<td><?= $entry['entry_state'] ?></td>
 					<td><?= unix_to_human($entry['edit_date']) ?></td>
 					<td><?= unix_to_human($entry['next_review_date']) ?></td>
-					<!--<td><?= $entry['days_since_edit'] ?></td>
-					<td><?= $entry['days_in_review'] ?></td>-->
 				</tr>
 			<?php endforeach; ?>
 		<?php endif; ?>

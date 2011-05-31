@@ -55,12 +55,12 @@ class Nsm_pp_workflow_mcp{
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
 		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
-		if(!$entries){
-			// returned false, error
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
-		}elseif(count($entries) == 0){
+		if(count($entries) == 0){
 			// returned no entries, tell user
 			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
+		}elseif(!$entries){
+			// returned false, error
+			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
 		}
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
@@ -71,9 +71,22 @@ class Nsm_pp_workflow_mcp{
 			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
 		
-		$this->_processNotifications($entry_ids);
-		
-		die($EE->lang->line('nsm_pp_workflow_review_entries_ok'));
+		$notification_status = $this->_processNotifications($entry_ids);
+		if($notification_status['sent'] == $notification_status['pending']){
+			$message = sprintf(
+							$EE->lang->line('nsm_pp_workflow_review_entries_ok'), 
+							$notification_status['sent'],
+							$notification_status['pending']
+						);
+			die($message);
+		}else{
+			$message = sprintf(
+							$EE->lang->line('nsm_pp_workflow_review_entries_email_error'), 
+							$notification_status['sent'],
+							$notification_status['pending']
+						);
+			die($message);
+		}
 	}
 	
 	private function _returnChannelIDs($settings)
@@ -106,6 +119,9 @@ class Nsm_pp_workflow_mcp{
 	
 	private function _processNotifications($entry_ids)
 	{
+		$emails_pending = 0;
+		$emails_sent = 0;
+		
 		$EE =& get_instance();
 		
 		$EE->load->library('email');
@@ -120,7 +136,8 @@ class Nsm_pp_workflow_mcp{
 				continue;
 			}
 			$email_recipients = explode("\n", $channel_settings['recipients']);
-			$email_from = $this->settings['notifications']['from'];
+			$email_from_name = $this->settings['notifications']['from_name'];
+			$email_from_address = $this->settings['notifications']['from_email'];
 			$email_subject = $this->settings['notifications']['subject'];
 			$email_message = $this->settings['notifications']['message'];
 			
@@ -129,13 +146,15 @@ class Nsm_pp_workflow_mcp{
 										'?D=cp&C=content_publish&M=entry_form'.
 										'&channel_id='.$entry['entry_id'].'&entry_id='.$entry['channel_id'];
 			
+			$emails_pending += count($email_recipients);
+			
 			// reset template engine
 			$EE->TMPL->final_template = "";
 		
 			// reset email object
 			$EE->email->clear();
 		
-			$EE->email->from($email_from);
+			$EE->email->from($email_from_address, $email_from_name);
 			$EE->email->to($email_recipients);
 			
 			// set the e mail subject and parse variables
@@ -153,8 +172,14 @@ class Nsm_pp_workflow_mcp{
 			$EE->email->message($email_message);
 			
 			// send the email
-			$EE->email->send();
+			if($EE->email->send()){
+				$emails_sent += count($email_recipients);
+			}
 		}
+		return array(
+					'pending' => $emails_pending,
+					'sent' => $emails_sent
+				);
 	}
 	
 	
@@ -175,7 +200,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
-		$vars = array('entries'=>false);
+		$vars = array('EE' => $EE, 'entries' => false);
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
@@ -204,7 +229,7 @@ class Nsm_pp_workflow_mcp{
 
 	public function _renderLayout($page, $out = FALSE) {
 		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line("{$page}_page_title"));
-		$this->EE->cp->set_breadcrumb(self::_route(), $this->EE->lang->line('nsm_exmple_addon_module_name'));
+		$this->EE->cp->set_breadcrumb(self::_route(), $this->EE->lang->line('nsm_pp_workflow_module_name'));
 
 		$nav = array();
 		foreach ($this->pages as $page) {

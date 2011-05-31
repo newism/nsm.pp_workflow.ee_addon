@@ -109,6 +109,7 @@ class Nsm_pp_workflow_ft extends EE_Fieldtype
 		$this->_loadResources();
 
 		$vars = array(
+			'EE' => $this->EE,
 			'data' => $data,
 			'title' => 'Publish Plus: Workflow',
 			'input_prefix' => $input_name

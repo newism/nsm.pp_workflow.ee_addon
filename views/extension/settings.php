@@ -41,7 +41,7 @@ $EE =& get_instance();
 	
 	<div class="tg">
 		<h2>Enable?</h2>
-		<table>
+		<table class="data NSM_Stripeable">
 			<tbody>
 				<tr>
 					<th scope="row">Enable?</th>
@@ -52,19 +52,10 @@ $EE =& get_instance();
 	</div>
 
 	<div class="tg">
-		<h2>Default review settings</h2>
-		<table>
-			<tbody>
-				<tr>
-					<th scope="row">Days till review</th>
-					<td><input
-						type="text"
-						name="<?= $input_prefix."[next_review_fallback]"; ?>" 
-						value="<?= form_prep($data['next_review_fallback']); ?>"
-					/></td>
-				</tr>
-			</tbody>
-		</table>
+		<h2>Automation</h2>
+		<div class="alert info">
+		To trigger review updates use this URL in a cron job: <strong><?= $EE->config->item('site_url').'?ACT='.''; ?></strong>.
+		</div>
 	</div>
 
 	<!-- 
@@ -75,7 +66,7 @@ $EE =& get_instance();
 	
 	<div class="tg">
 		<h2>Channel settings</h2>
-		<table>
+		<table class="data NSM_Stripeable">
 			<thead>
 				<tr>
 					<th scope="col" style="width:18px;"></th>
@@ -124,14 +115,22 @@ $EE =& get_instance();
 
 	<div class="tg">
 		<h2>Notification settings</h2>
-		<table>
+		<table class="data NSM_Stripeable">
 			<tbody>
+				<tr>
+					<th scope="row">Sender name</th>
+					<td><input
+						type="text"
+						name="<?= $input_prefix."[notifications][from_name]"; ?>" 
+						value="<?= form_prep($data['notifications']['from_name']); ?>"
+					/></td>
+				</tr>
 				<tr>
 					<th scope="row">Sender address</th>
 					<td><input
 						type="text"
-						name="<?= $input_prefix."[notifications][from]"; ?>" 
-						value="<?= form_prep($data['notifications']['from']); ?>"
+						name="<?= $input_prefix."[notifications][from_email]"; ?>" 
+						value="<?= form_prep($data['notifications']['from_email']); ?>"
 					/></td>
 				</tr>
 				<tr>
