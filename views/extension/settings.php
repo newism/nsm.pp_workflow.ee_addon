@@ -54,7 +54,12 @@ $EE =& get_instance();
 	<div class="tg">
 		<h2>Automation</h2>
 		<div class="alert info">
-		To trigger review updates use this URL in a cron job: <strong><?= $EE->config->item('site_url').'?ACT='.''; ?></strong>.
+		To trigger review updates use this URL in a cron job: 
+		<strong>
+			<a href="<?= $EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'review_entries'); ?>">
+				<?= $EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'review_entries'); ?>
+			</a>
+		</strong>.
 		</div>
 	</div>
 
