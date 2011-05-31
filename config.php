@@ -20,4 +20,4 @@ if(!defined('NSM_PP_WORKFLOW_VERSION')) {
 $config['name'] 	= NSM_PP_WORKFLOW_NAME;
 $config["version"] 	= NSM_PP_WORKFLOW_VERSION;
 
-$config['nsm_addon_updater']['versions_xml'] = 'http://github.com/newism/nsm.pp_workflow.ee_addon/raw/master/versions.xml';
+//$config['nsm_addon_updater']['versions_xml'] = 'http://github.com/newism/nsm.pp_workflow.ee_addon/raw/master/versions.xml';
