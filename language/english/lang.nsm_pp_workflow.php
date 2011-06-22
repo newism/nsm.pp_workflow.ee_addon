@@ -62,6 +62,7 @@ $lang = array(
 	'nsm_pp_workflow_mcp_index_review_table_columns_review_date' => 'Review date',
 	
 	'nsm_pp_workflow_mcp_index_review_table_no_results' => 'No entries ready for review.',
+	'nsm_pp_workflow_mcp_index_review_table_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',
 	
 	
 	'nsm_pp_workflow_review_entries_db_select_error' => 'A database error occured.',
