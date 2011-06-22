@@ -39,7 +39,13 @@ class Nsm_pp_workflow_model {
 		}
 	}
 	
-	
+	/**
+	 * Sets a new Next Review Date and overwrites the Last Review Date with the previous Next Review Date value.
+	 *
+	 * @access public
+	 * @param int Time-stamp of next review date
+	 * @return string This instance's title
+	 **/
 	public function setNewReviewDate($date)
 	{
 		$this->last_review_date = $this->next_review_date;
@@ -49,7 +55,7 @@ class Nsm_pp_workflow_model {
 	
 	/**
 	 * PHP5 toString function.
-	 * Returns a string version of class instance
+	 * Returns a string version of class instance.
 	 *
 	 * @access public
 	 * @return string This instance's title
@@ -153,7 +159,12 @@ class Nsm_pp_workflow_model {
 		}
 	}
 	
-	
+	/**
+	 * Returns an array representation of the object instance.
+	 * 
+	 * @access public
+	 * @return array
+	 */
 	public function asArray()
 	{
 		$data = array();
@@ -171,8 +182,12 @@ class Nsm_pp_workflow_model {
 		return $data;
 	}
 	
-	
-	// retrieves data in a tag friendly ready way
+	/**
+	 * Returns an array representation of the object instance in the EE tagdata format.
+	 * 
+	 * @access public
+	 * @return array
+	 */
 	public function tag_data()
 	{
 		$as_array = $this->asArray();
@@ -191,14 +206,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Retrieves a workflow object containing workflow meta-data assigned to the Entry ID. 
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
 	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @return mixed If no results return false Else return an instance of the object
 	 **/
 	public static function findByEntryId($entry_id)
 	{
@@ -222,14 +235,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Retrieves an array collection of workflow objects that are up for review.
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
-	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @param array $channel_ids Array of channel IDs to search within
+	 * @return mixed If no results return false Else return an array of objects
 	 **/
 	public static function findByReviewNow($channel_ids)
 	{
@@ -259,14 +270,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Extracts and returns the Entry IDs from the workflow metadata collection as an array
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
-	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @param array $entries Array of Workflow objects
+	 * @return array Collection of unique Entry IDs
 	 **/
 	public static function getCollectionEntryIds($entries)
 	{
@@ -279,14 +288,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Update workflow table entries entry state that are up for review.
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
-	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @param array $channel_ids Array of channel IDs to search within
+	 * @return bool Database status
 	 **/
 	public static function updateEntryState($channel_ids)
 	{
@@ -306,14 +313,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Find workflow entry matching the workflow ID.
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
-	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @param int $id Workflow ID
+	 * @return mixed If no results return false Else return an instance of the object
 	 **/
 	public static function findById($id)
 	{
@@ -337,14 +342,12 @@ class Nsm_pp_workflow_model {
 	
 	
 	/**
-	 * Returns array of report preset objects that appear in the array parameter
+	 * Finds all workflow entries that have status of review.
 	 *
 	 * @access public
 	 * @static
-	 * @param int $site_id Site ID
-	 * @param int $entry_id Entry ID
-	 * @param int $field_id Field ID
-	 * @return array Collection of configuration presets
+	 * @param array $channel_ids Array of channel IDs to search within
+	 * @return mixed If no results return false Else return an array of objects
 	 **/
 	public static function findStateReview($channel_ids)
 	{
@@ -364,6 +367,13 @@ class Nsm_pp_workflow_model {
 		return $entries;
 	}
 	
+	/**
+	 * Returns the table name used by this model.
+	 *
+	 * @access public
+	 * @static
+	 * @return string Table name
+	 **/
 	public static function getTableName()
 	{
 		return self::$table_name;
@@ -392,8 +402,12 @@ class Nsm_pp_workflow_model {
 	);
 
 	/**
-	 * Create the model table
-	 */
+	 * Create the database table.
+	 *
+	 * @access public
+	 * @static
+	 * @return void
+	 **/
 	public static function createTable() {
 		$EE =& get_instance();
 		$EE->load->dbforge();
