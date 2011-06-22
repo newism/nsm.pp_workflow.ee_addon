@@ -74,7 +74,7 @@ $EE =& get_instance();
 		<table class="data NSM_Stripeable">
 			<thead>
 				<tr>
-					<th scope="col" style="width:18px;"></th>
+					<th scope="col" style="width:28px;">Enable?</th>
 					<th scope="col">Channel</th>
 					<th scope="col">Days till review</th>
 					<th scope="col">Email recipients</th>
@@ -83,7 +83,7 @@ $EE =& get_instance();
 			<tbody>
 			<?php foreach($channels as $channel_id => $channel_name) : ?>
 				<tr>
-					<td>
+					<td style="text-align:center;">
 						<input
 							type="hidden"
 							name="<?= $input_prefix."[channels][".$channel_id."][enabled]"; ?>" 
