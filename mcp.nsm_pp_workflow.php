@@ -200,7 +200,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
-		$vars = array('EE' => $EE, 'entries' => false);
+		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results');
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
@@ -209,6 +209,8 @@ class Nsm_pp_workflow_mcp{
 		$entries = false;
 		if($channel_ids){
 			$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+		}else{
+			$vars['error_tag'] = 'no_channels';
 		}
 		if($entries){
 			$vars['entries'] = array();

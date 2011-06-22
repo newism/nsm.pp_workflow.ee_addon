@@ -45,7 +45,7 @@
 		<?php if(!$entries): ?>
 			<tr>
 				<td colspan="7" class="alert">
-					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_no_results') ?>
+					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_'.$error_tag) ?>
 				</td>
 			</tr>
 		<?php else: ?>
