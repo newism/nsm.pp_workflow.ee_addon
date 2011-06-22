@@ -206,7 +206,10 @@ class Nsm_pp_workflow_mcp{
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+		$entries = false;
+		if($channel_ids){
+			$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+		}
 		if($entries){
 			$vars['entries'] = array();
 			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
