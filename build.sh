@@ -9,6 +9,7 @@ cp mod.* ${third_party_path}
 cp tab.* ${third_party_path}
 cp upd.* ${third_party_path}
 cp LICENSE.md ${third_party_path}
+cp CHANGELOG.md ${third_party_path}
 cp README.md ${third_party_path}
 cp config.php ${third_party_path}
 cp -R language ${third_party_path}
