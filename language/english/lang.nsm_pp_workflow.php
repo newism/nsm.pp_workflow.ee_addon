@@ -18,14 +18,14 @@ $lang = array(
 	'nsm_pp_workflow_module_name' => 'NSM Publish Plus: Workflow',
 	'nsm_pp_workflow_module_description' => 'Extends Expression Engine\'s publishing process.',
 
-	'nsm_pp_workflow_index_page_title' => 'Dashboard',
-	'nsm_pp_workflow_index_nav_title' => 'Dashboard',
+	'nsm_pp_workflow_index_page_title' => 'Review Entries',
+	'nsm_pp_workflow_index_nav_title' => 'Review Entries',
 	
-	'nsm_pp_workflow_find_pending_page_title' => 'Pending',
-	'nsm_pp_workflow_find_pending_nav_title' => 'Pending',
+	'nsm_pp_workflow_find_pending_page_title' => 'Pending Entries',
+	'nsm_pp_workflow_find_pending_nav_title' => 'Pending Entries',
 	
-	'nsm_pp_workflow_find_approved_page_title' => 'Approved',
-	'nsm_pp_workflow_find_approved_nav_title' => 'Approved',
+	'nsm_pp_workflow_find_approved_page_title' => 'Approved Entries',
+	'nsm_pp_workflow_find_approved_nav_title' => 'Approved Entries',
 	
 	'nsm_pp_workflow_mcp_review_entries_page_title' => 'Check Now',
 	'nsm_pp_workflow_mcp_review_entries_nav_title' => 'Check Now',

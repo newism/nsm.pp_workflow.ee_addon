@@ -58,8 +58,8 @@
 						</a>
 					</th>
 					<td><?= $entry['channel_title'] ?></td>
-					<td><?= $entry['status'] ?></td>
-					<td><?= $entry['entry_state'] ?></td>
+					<td><?= ucfirst($entry['status']) ?></td>
+					<td><?= ucfirst($entry['entry_state']) ?></td>
 					<td><?= unix_to_human($entry['edit_date']) ?></td>
 					<td><?= unix_to_human($entry['next_review_date']) ?></td>
 				</tr>
