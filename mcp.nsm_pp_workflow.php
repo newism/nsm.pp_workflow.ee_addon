@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow CP 
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.9.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -19,7 +19,10 @@ class Nsm_pp_workflow_mcp{
 	public static $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 
 	private $pages = array(
-		"index"
+		"index",
+		"find_pending",
+		"find_approved",
+		"mcp_review_entries"
 	);
 
 	public function __construct() {
@@ -32,8 +35,19 @@ class Nsm_pp_workflow_mcp{
 		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$this->settings = $nsm_pp_ext->settings;
 	}
-	
-	
+
+	public function mcp_review_entries()
+	{
+		$review_status = $this->review_entries();
+		$this->EE->session->set_flashdata('message_'.$review_status[0], $review_status[1]);
+		$this->EE->functions->redirect( self::_route('index') );
+	}
+
+	public function cron_review_entries(){
+		$review_status = $this->review_entries();
+		die( $review_status[1] );
+	}
+
 	public function review_entries()
 	{	
 		$EE =& get_instance();
@@ -53,14 +67,18 @@ class Nsm_pp_workflow_mcp{
 		}
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
+		if(!count($channel_ids)){
+			// no channels set
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_no_channels'));
+		}
 		
 		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
 		if(count($entries) == 0){
 			// returned no entries, tell user
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
+			return array('success', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
 		}elseif(!$entries){
 			// returned false, error
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
 		}
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
@@ -68,7 +86,7 @@ class Nsm_pp_workflow_mcp{
 		$updates = Nsm_pp_workflow_model::updateEntryState($channel_ids);
 		$updates = true;
 		if(!$updates){
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
 		
 		$notification_status = $this->_processNotifications($entry_ids);
@@ -78,14 +96,14 @@ class Nsm_pp_workflow_mcp{
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}else{
 			$message = sprintf(
 							$EE->lang->line('nsm_pp_workflow_review_entries_email_error'), 
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}
 	}
 	
@@ -185,6 +203,19 @@ class Nsm_pp_workflow_mcp{
 	
 	
 	public function index(){
+		return $this->dashboard('review', 'index');
+	}
+	
+	public function find_pending(){
+		return $this->dashboard('pending', 'find_pending');
+	}
+	
+	public function find_approved(){
+		return $this->dashboard('approved', 'find_approved');
+	}
+	
+	
+	public function dashboard($find_state = 'review', $page = 'index'){
 		$EE =& get_instance();
 		$EE->lang->loadfile('nsm_pp_workflow');
 		$EE->load->helper('date');
@@ -200,7 +231,13 @@ class Nsm_pp_workflow_mcp{
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
-		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results');
+		$vars = array(
+		    'EE' => $EE, 
+		    'entries' => false, 
+		    'error_tag' => 'no_results', 
+		    'filter_state' => $find_state,
+		    'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
+		);
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
@@ -208,7 +245,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$entries = false;
 		if($channel_ids){
-			$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+			$entries = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
 		}else{
 			$vars['error_tag'] = 'no_channels';
 		}
@@ -227,18 +264,18 @@ class Nsm_pp_workflow_mcp{
 				$vars['entries'][] = $entry;
 			}
 		}
-		
 		$out = $this->EE->load->view("module/index", $vars, TRUE);
-		return $this->_renderLayout("index", $out);
+		return $this->_renderLayout($page, $out);
 	}
+	
 
 	public function _renderLayout($page, $out = FALSE) {
-		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line("{$page}_page_title"));
+		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line(self::$addon_id."_{$page}_page_title"));
 		$this->EE->cp->set_breadcrumb(self::_route(), $this->EE->lang->line('nsm_pp_workflow_module_name'));
 
 		$nav = array();
 		foreach ($this->pages as $page) {
-			$nav[lang("{$page}_nav_title")] = self::_route($page);
+			$nav[lang(self::$addon_id."_{$page}_nav_title")] = self::_route($page);
 		}
 		$this->EE->cp->set_right_nav($nav);
 		return "<div class='mor'>{$out}</div>";

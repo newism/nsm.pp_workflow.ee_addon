@@ -1,15 +1,23 @@
 <div class="mor cf">
+	<?php if(!$data['channel_enabled']) : ?>
+	<div class="alert info">
+		<?= sprintf($EE->lang->line('nsm_pp_workflow_tab_review_not_enabled'), $extension_settings_url); ?>
+	</div>
+	<?php else: ?>
 	<div class="tg">
-		<h2>Entry state</h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_tab_review_state_heading') ?></h2>
 		<div class="alert info">
-			<?= $EE->lang->line('nsm_pp_workflow_tab_review_state_intro') ?>
+			<?= sprintf(
+					$EE->lang->line('nsm_pp_workflow_tab_review_state_intro'),
+					$EE->lang->line('nsm_pp_workflow_tab_review_state_'.$data['default_state'].'_label')
+				) ?>
 		</div>
 		<table class="data NSM_Stripeable">
 			<thead>
 				<tr>
-					<th scope="col" style="width:18px"></th>
-					<th scope="col">State</th>
-					<th scope="col">Description</th>
+					<th scope="col" style="width:18px"><?= $EE->lang->line('nsm_pp_workflow_tab_review_state_table_columns_choice') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_tab_review_state_table_columns_state') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_tab_review_state_table_columns_description') ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -57,19 +65,17 @@
 	</div>
 
 	<div class="tg">
-		<h2>Next review date</h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_tab_review_date_heading') ?></h2>
 		<div class="alert info">
 			<?= sprintf($EE->lang->line('nsm_pp_workflow_tab_review_date_intro'), $data['days_till_review']) ?>
-			<!--The administrator has specified that entries in this channel should be reviewed every <strong><?= $data['days_till_review'] ?> days</strong>.
-			Estimated review dates will be calculated using this setting.-->
 		</div>
 		<table class="data NSM_Stripeable">
 			<thead>
 				<tr>
-					<th scope="col" style="width:18px"></th>
-					<th scope="col">Name</th>
-					<th scope="col">Date</th>
-					<th scope="col">Description</th>
+					<th scope="col" style="width:18px"><?= $EE->lang->line('nsm_pp_workflow_tab_review_date_table_columns_choice') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_tab_review_date_table_columns_name') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_tab_review_date_table_columns_date') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_tab_review_date_table_columns_description') ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -165,4 +171,5 @@
 			</tbody>
 		</table>
 	</div>
+	<?php endif; ?>
 </div>

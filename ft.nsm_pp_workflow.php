@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Fieldtype
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.9.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -112,16 +112,23 @@ class Nsm_pp_workflow_ft extends EE_Fieldtype
 			'EE' => $this->EE,
 			'data' => $data,
 			'title' => 'Publish Plus: Workflow',
-			'input_prefix' => $input_name
+			'input_prefix' => $input_name,
+			'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
 		);
 
-		// Use the native CI Loader class
-		// We need to to do this becuase this field may have been loaded by Matrix or Low varibales
-		return $this->EE->load->_ci_load(array(
-			'_ci_vars' => $vars,
-			'_ci_path' => PATH_THIRD . 'nsm_pp_workflow/views/fieldtype/field.php',
-			'_ci_return' => true
-		));
+		if(APP_VER < '2.1.5') {
+			// EE < .2.2.0
+			// Use the native CI Loader class
+			// We need to to do this becuase this field may have been loaded by Matrix or Low variables
+			return $this->EE->load->_ci_load(array(
+				'_ci_vars' => $vars,
+				'_ci_path' => PATH_THIRD . 'nsm_pp_workflow/views/fieldtype/field.php',
+				'_ci_return' => true
+			));
+		}else{
+			$this->EE->load->add_package_path(PATH_THIRD . 'nsm_pp_workflow');
+			return $this->EE->load->view('fieldtype/field', $vars, TRUE);
+		}
 	}
 
 	/**

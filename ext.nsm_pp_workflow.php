@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Extension
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.9.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -135,6 +135,7 @@ class Nsm_pp_workflow_ext
 			'error' => FALSE,
 			'input_prefix' => __CLASS__,
 			'message' => FALSE,
+			'entry_states' => array('pending', 'approved', 'review')
 		);
 
 		// Are there settings posted from the form?
@@ -167,7 +168,8 @@ class Nsm_pp_workflow_ext
 				$vars['data']['channels'][ $row->channel_id ] = array(
 																		'enabled' => 0,
 																		'next_review' => 60,
-																		'recipients' => ''
+																		'recipients' => '',
+																		'state' => ''
 																	);
 			}
 		}
@@ -458,7 +460,7 @@ class Nsm_pp_workflow_ext
 			if ($settings_query->num_rows()) {
 
 				if ( ! function_exists('json_decode')) {
-					$$EE->load->library('Services_json');
+					$EE->load->library('Services_json');
 				}
 
 				$settings = json_decode($settings_query->row()->settings, TRUE);
