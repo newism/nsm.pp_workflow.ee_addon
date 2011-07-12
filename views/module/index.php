@@ -24,28 +24,28 @@
 
 <div class="mor">
 	<div class="tg">
-		<h2><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_heading') ?></h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_mcp_index_'.$filter_state.'_heading') ?></h2>
 		<div class="alert info">
-			<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_intro') ?>
+			<?= $EE->lang->line('nsm_pp_workflow_mcp_index_'.$filter_state.'_intro') ?>
 		</div>
 		<table class="data col-sortable NSM_Stripeable">
 			<col class="id" style="width:90px;"/>
 			<thead>
 				<tr>
-					<th scope="col" class="id"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_entry_id') ?></th>
-					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_title') ?></th>
-					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_channel') ?></th>
-					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_status') ?></th>
-					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_state') ?></th>
-					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_last_edited') ?></th>
-					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_columns_review_date') ?></th>
+					<th scope="col" class="id"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_entry_id') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_title') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_channel') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_status') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_state') ?></th>
+					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_last_edited') ?></th>
+					<th scope="col" class="date"><?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_columns_review_date') ?></th>
 				</tr>
 			</thead>
 			<tbody>
 		<?php if(!$entries): ?>
 			<tr>
 				<td colspan="7" class="alert">
-					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_review_table_'.$error_tag) ?>
+					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_'.$error_tag) ?>
 				</td>
 			</tr>
 		<?php else: ?>
