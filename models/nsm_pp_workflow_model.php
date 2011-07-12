@@ -380,9 +380,8 @@ class Nsm_pp_workflow_model {
 	public static function findByState($state, $channel_ids)
 	{
 		$EE =& get_instance();
-		$safe_state = preg_replace('/[^a-z0-9]/', '', $state);
 		$EE->db->from(self::$table_name);
-		$EE->db->where('entry_state = "'.$safe_state.'"');
+		$EE->db->where('entry_state = "'.$state.'"');
 		$EE->db->where_in('channel_id', $channel_ids);
 		$EE->db->where('site_id', $EE->config->item('site_id'));
 		$get_entries = $EE->db->get();
