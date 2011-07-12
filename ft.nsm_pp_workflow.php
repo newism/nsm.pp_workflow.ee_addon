@@ -112,7 +112,8 @@ class Nsm_pp_workflow_ft extends EE_Fieldtype
 			'EE' => $this->EE,
 			'data' => $data,
 			'title' => 'Publish Plus: Workflow',
-			'input_prefix' => $input_name
+			'input_prefix' => $input_name,
+			'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
 		);
 
 		if(APP_VER < '2.1.5') {

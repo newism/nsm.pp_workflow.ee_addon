@@ -44,8 +44,8 @@
 			<tbody>
 		<?php if(!$entries): ?>
 			<tr>
-				<td colspan="7" class="alert">
-					<?= $EE->lang->line('nsm_pp_workflow_mcp_index_table_'.$error_tag) ?>
+				<td colspan="7" class="alert error">
+					<?= sprintf($EE->lang->line('nsm_pp_workflow_mcp_index_table_'.$error_tag), $extension_settings_url); ?>
 				</td>
 			</tr>
 		<?php else: ?>
