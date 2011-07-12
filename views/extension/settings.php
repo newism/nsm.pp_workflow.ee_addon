@@ -105,7 +105,9 @@ $EE =& get_instance();
 						<?php foreach($entry_states as $state) : ?>
 							<option
 								value="<?= $state ?>"
-								<?= ($data['channels'][$channel_id]['state'] == $state ? 'selected="selected"' : '') ?>
+								<?php if(isset($data['channels'][$channel_id]['state']) && $data['channels'][$channel_id]['state'] == $state) : ?>
+									selected="selected"
+								<?php endif; ?>
 							>
 								<?= $EE->lang->line('nsm_pp_workflow_tab_review_state_'.$state.'_label') ?>
 							</option>

@@ -98,6 +98,7 @@ $lang = array(
 	'nsm_pp_workflow_mcp_index_table_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',
 	
 	
+	'nsm_pp_workflow_review_entries_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',
 	'nsm_pp_workflow_review_entries_db_select_error' => 'A database error occured.',
 	'nsm_pp_workflow_review_entries_db_select_none' => 'No entries due for review.',
 	'nsm_pp_workflow_review_entries_db_update_error' => 'An error occured while updating entry states.',

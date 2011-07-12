@@ -66,6 +66,10 @@ class Nsm_pp_workflow_mcp{
 		}
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
+		if(!count($channel_ids)){
+			// no channels set
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_no_channels'));
+		}
 		
 		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
 		if(count($entries) == 0){
