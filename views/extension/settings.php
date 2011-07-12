@@ -166,7 +166,7 @@ $EE =& get_instance();
 		<div class="alert info">
 		<?= sprintf(
 				$EE->lang->line('nsm_pp_workflow_ext_automation_message'),
-				$EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'review_entries')
+				$EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'cron_review_entries')
 			) ?>
 		</div>
 	</div>

@@ -27,8 +27,8 @@ $lang = array(
 	'nsm_pp_workflow_find_approved_page_title' => 'Approved',
 	'nsm_pp_workflow_find_approved_nav_title' => 'Approved',
 	
-	'nsm_pp_workflow_run_content_review_page_title' => 'Check Now',
-	'nsm_pp_workflow_run_content_review_nav_title' => 'Check Now',
+	'nsm_pp_workflow_mcp_review_entries_page_title' => 'Check Now',
+	'nsm_pp_workflow_mcp_review_entries_nav_title' => 'Check Now',
 
 	/* Extension */
 	'save_extension_settings' => 'Save extension settings',

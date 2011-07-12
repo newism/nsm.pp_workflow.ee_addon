@@ -23,7 +23,7 @@ class Nsm_pp_workflow_upd
 	private $has_tabs = true;
 
 	private $actions = array(
-		'Nsm_pp_workflow_mcp::review_entries'
+		'Nsm_pp_workflow_mcp::cron_review_entries'
 	);
 	private $models = array(
 		'Nsm_pp_workflow_model'

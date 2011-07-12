@@ -22,7 +22,7 @@ class Nsm_pp_workflow_mcp{
 		"index",
 		"find_pending",
 		"find_approved",
-		"run_content_review"
+		"mcp_review_entries"
 	);
 
 	public function __construct() {
@@ -36,11 +36,17 @@ class Nsm_pp_workflow_mcp{
 		$this->settings = $nsm_pp_ext->settings;
 	}
 	
-	public function run_content_review()
+	public function mcp_review_entries()
 	{
-		$this->review_entries();
+		$review_status = $this->review_entries();
+		$this->EE->session->set_flashdata('message_'.$review_status[0], $review_status[1]);
+		$this->EE->functions->redirect( self::_route('index') );
 	}
 	
+	public function cron_review_entries(){
+		$review_status = $this->review_entries();
+		die( $review_status[1] );
+	}
 	public function review_entries()
 	{	
 		$EE =& get_instance();
@@ -64,10 +70,10 @@ class Nsm_pp_workflow_mcp{
 		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
 		if(count($entries) == 0){
 			// returned no entries, tell user
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
+			return array('success', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
 		}elseif(!$entries){
 			// returned false, error
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
 		}
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
@@ -75,7 +81,7 @@ class Nsm_pp_workflow_mcp{
 		$updates = Nsm_pp_workflow_model::updateEntryState($channel_ids);
 		$updates = true;
 		if(!$updates){
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
 		
 		$notification_status = $this->_processNotifications($entry_ids);
@@ -85,14 +91,14 @@ class Nsm_pp_workflow_mcp{
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}else{
 			$message = sprintf(
 							$EE->lang->line('nsm_pp_workflow_review_entries_email_error'), 
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}
 	}
 	
