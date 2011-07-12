@@ -19,7 +19,10 @@ class Nsm_pp_workflow_mcp{
 	public static $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 
 	private $pages = array(
-		"index"
+		"index",
+		"find_pending",
+		"find_approved",
+		"run_content_review"
 	);
 
 	public function __construct() {
@@ -33,6 +36,10 @@ class Nsm_pp_workflow_mcp{
 		$this->settings = $nsm_pp_ext->settings;
 	}
 	
+	public function run_content_review()
+	{
+		$this->review_entries();
+	}
 	
 	public function review_entries()
 	{	
@@ -185,6 +192,19 @@ class Nsm_pp_workflow_mcp{
 	
 	
 	public function index(){
+		return $this->dashboard('review', 'index');
+	}
+	
+	public function find_pending(){
+		return $this->dashboard('pending', 'find_pending');
+	}
+	
+	public function find_approved(){
+		return $this->dashboard('approved', 'find_approved');
+	}
+	
+	
+	public function dashboard($find_state = 'review', $page = 'index'){
 		$EE =& get_instance();
 		$EE->lang->loadfile('nsm_pp_workflow');
 		$EE->load->helper('date');
@@ -200,7 +220,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
-		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results');
+		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results', 'filter_state' => $find_state);
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
@@ -208,7 +228,7 @@ class Nsm_pp_workflow_mcp{
 		
 		$entries = false;
 		if($channel_ids){
-			$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+			$entries = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
 		}else{
 			$vars['error_tag'] = 'no_channels';
 		}
@@ -229,16 +249,17 @@ class Nsm_pp_workflow_mcp{
 		}
 		
 		$out = $this->EE->load->view("module/index", $vars, TRUE);
-		return $this->_renderLayout("index", $out);
+		return $this->_renderLayout($page, $out);
 	}
+	
 
 	public function _renderLayout($page, $out = FALSE) {
-		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line("{$page}_page_title"));
+		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line(self::$addon_id."_{$page}_page_title"));
 		$this->EE->cp->set_breadcrumb(self::_route(), $this->EE->lang->line('nsm_pp_workflow_module_name'));
 
 		$nav = array();
 		foreach ($this->pages as $page) {
-			$nav[lang("{$page}_nav_title")] = self::_route($page);
+			$nav[lang(self::$addon_id."_{$page}_nav_title")] = self::_route($page);
 		}
 		$this->EE->cp->set_right_nav($nav);
 		return "<div class='mor'>{$out}</div>";
