@@ -367,6 +367,36 @@ class Nsm_pp_workflow_model {
 		return $entries;
 	}
 	
+	
+	/**
+	 * Finds all workflow entries that match the status parameter.
+	 *
+	 * @access public
+	 * @static
+	 * @param string $state Workflow state to search entries by
+	 * @param array $channel_ids Array of channel IDs to search within
+	 * @return mixed If no results return false Else return an array of objects
+	 **/
+	public static function findByState($state, $channel_ids)
+	{
+		$EE =& get_instance();
+		$safe_state = preg_replace('/[^a-z0-9]/', '', $state);
+		$EE->db->from(self::$table_name);
+		$EE->db->where('entry_state = "'.$safe_state.'"');
+		$EE->db->where_in('channel_id', $channel_ids);
+		$EE->db->where('site_id', $EE->config->item('site_id'));
+		$get_entries = $EE->db->get();
+		$results = $get_entries->result_array();
+		$entries = array();
+		if(count($results) > 0){
+			foreach($results as $result){
+				$entries[] = new Nsm_pp_workflow_model($result);
+			}
+		}
+		return $entries;
+	}
+	
+	
 	/**
 	 * Returns the table name used by this model.
 	 *
