@@ -4,7 +4,7 @@
  * NSM Publish Plus: Workflow Language File
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.9.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -98,7 +98,6 @@ $lang = array(
 	'nsm_pp_workflow_mcp_index_table_no_channels' => 'There are no channels being monitored by this module. Please check your <a href="%1$s">extension settings</a>.',
 	
 	
-	'nsm_pp_workflow_review_entries_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',
 	'nsm_pp_workflow_review_entries_db_select_error' => 'A database error occured.',
 	'nsm_pp_workflow_review_entries_db_select_none' => 'No entries due for review.',
 	'nsm_pp_workflow_review_entries_db_update_error' => 'An error occured while updating entry states.',

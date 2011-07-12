@@ -4,7 +4,7 @@
  * Config file for NSM Publish Plus: Workflow
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.9.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -12,7 +12,7 @@
  */
 
 if(!defined('NSM_PP_WORKFLOW_VERSION')) {
-	define('NSM_PP_WORKFLOW_VERSION', '0.0.1');
+	define('NSM_PP_WORKFLOW_VERSION', '0.9.0');
 	define('NSM_PP_WORKFLOW_NAME', 'NSM Publish Plus: Workflow');
 	define('NSM_PP_WORKFLOW_ADDON_ID', 'nsm_pp_workflow');
 }
