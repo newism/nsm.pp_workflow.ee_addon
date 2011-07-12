@@ -1,7 +1,7 @@
 <div class="mor cf">
 	<?php if(!$data['channel_enabled']) : ?>
 	<div class="alert info">
-		<?= $EE->lang->line('nsm_pp_workflow_tab_review_not_enabled') ?>
+		<?= sprintf($EE->lang->line('nsm_pp_workflow_tab_review_not_enabled'), $extension_settings_url); ?>
 	</div>
 	<?php else: ?>
 	<div class="tg">

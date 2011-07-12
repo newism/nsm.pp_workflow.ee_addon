@@ -40,7 +40,7 @@ $lang = array(
 	
 	'nsm_pp_workflow_tab_review_date_label' => 'Workflow',
 	
-	'nsm_pp_workflow_tab_review_not_enabled' => 'This channel is not being monitored by this module. Please check your extension settings.',
+	'nsm_pp_workflow_tab_review_not_enabled' => 'This channel is not being monitored by this module. Please check your <a href="%1$s">extension settings</a>.',
 	
 	'nsm_pp_workflow_tab_review_state_heading' => 'Entry state',
 	'nsm_pp_workflow_tab_review_state_intro' => 'Choose workflow state for the entry. The default state for entries in this channel is <strong>%1$s</strong>.',
@@ -95,7 +95,7 @@ $lang = array(
 	'nsm_pp_workflow_mcp_index_table_columns_review_date' => 'Review date',
 	
 	'nsm_pp_workflow_mcp_index_table_no_results' => 'No entries ready for review.',
-	'nsm_pp_workflow_mcp_index_table_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',
+	'nsm_pp_workflow_mcp_index_table_no_channels' => 'There are no channels being monitored by this module. Please check your <a href="%1$s">extension settings</a>.',
 	
 	
 	'nsm_pp_workflow_review_entries_no_channels' => 'There are no channels being monitored by this module. Please check your extension settings.',

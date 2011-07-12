@@ -35,18 +35,19 @@ class Nsm_pp_workflow_mcp{
 		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$this->settings = $nsm_pp_ext->settings;
 	}
-	
+
 	public function mcp_review_entries()
 	{
 		$review_status = $this->review_entries();
 		$this->EE->session->set_flashdata('message_'.$review_status[0], $review_status[1]);
 		$this->EE->functions->redirect( self::_route('index') );
 	}
-	
+
 	public function cron_review_entries(){
 		$review_status = $this->review_entries();
 		die( $review_status[1] );
 	}
+
 	public function review_entries()
 	{	
 		$EE =& get_instance();
@@ -230,7 +231,13 @@ class Nsm_pp_workflow_mcp{
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
 		
-		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results', 'filter_state' => $find_state);
+		$vars = array(
+		    'EE' => $EE, 
+		    'entries' => false, 
+		    'error_tag' => 'no_results', 
+		    'filter_state' => $find_state,
+		    'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
+		);
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
@@ -257,7 +264,6 @@ class Nsm_pp_workflow_mcp{
 				$vars['entries'][] = $entry;
 			}
 		}
-		
 		$out = $this->EE->load->view("module/index", $vars, TRUE);
 		return $this->_renderLayout($page, $out);
 	}
