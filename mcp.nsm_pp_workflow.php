@@ -233,7 +233,7 @@ class Nsm_pp_workflow_mcp{
 		$vars = array(
 		    'EE' => $EE, 
 		    'entries' => false, 
-		    'error_tag' => 'no_results', 
+		    'error_tag' => $find_state.'_no_results', 
 		    'filter_state' => $find_state,
 		    'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
 		);
@@ -242,21 +242,20 @@ class Nsm_pp_workflow_mcp{
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = false;
+		$workflow_objects = false;
 
 		if($channel_ids){
-			$entries = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
+			$workflow_objects = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
 		}else{
 			$vars['error_tag'] = 'no_channels';
 		}
 
-		if($entries){
+		if($workflow_objects){
 			$vars['entries'] = array();
-			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
-			$entries = $this->_returnEntries($entry_ids);
-			foreach($entries as $entry_row){
+			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($workflow_objects);
+			$channel_entries = $this->_returnEntries($entry_ids);
+			foreach($channel_entries as $entry_row){
 				$entry = $entry_row;
-				unset($entry->EE);
 				$entry['edit_date'] = strtotime($entry['edit_date']);
 				$entry['days_in_review'] = ceil(($entry['last_review_date'] - mktime()) / (24 * 60 * 60));
 				if($entry['days_in_review'] < 1){ $entry['days_in_review'] = "None"; }

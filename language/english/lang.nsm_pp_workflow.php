@@ -97,6 +97,9 @@ $lang = array(
 	'nsm_pp_workflow_mcp_index_table_no_results' => 'No entries ready for review.',
 	'nsm_pp_workflow_mcp_index_table_no_channels' => 'There are no channels being monitored by this module. Please check your <a href="%1$s">extension settings</a>.',
 	
+	'nsm_pp_workflow_mcp_index_table_review_no_results' => 'No entries ready for review.',
+	'nsm_pp_workflow_mcp_index_table_pending_no_results' => 'No entries pending approval.',
+	'nsm_pp_workflow_mcp_index_table_approved_no_results' => 'No entries marked as approved.',
 	
 	'nsm_pp_workflow_review_entries_db_select_error' => 'A database error occured.',
 	'nsm_pp_workflow_review_entries_db_select_none' => 'No entries due for review.',
