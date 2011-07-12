@@ -129,9 +129,8 @@ class Nsm_pp_workflow_mcp{
 		$EE->db->from($table_name);
 		$EE->db->join('channel_titles', 'channel_titles.entry_id = '.$table_name.'.entry_id', 'left');
 		$EE->db->join('channels', 'channel_titles.channel_id = channels.channel_id', 'left');
-		$EE->db->where_in('id', $entry_ids);
+		$EE->db->where_in('channel_titles.entry_id', $entry_ids);
 		$targeted_entries = $EE->db->get();
-		
 		return $targeted_entries->result_array();
 	}
 	
@@ -228,9 +227,9 @@ class Nsm_pp_workflow_mcp{
 			$nsm_pp_ext = new Nsm_pp_workflow_ext();
 			$this->settings = $nsm_pp_ext->settings;
 		}
-		
+
 		$channel_ids = $this->_returnChannelIDs($this->settings);
-		
+
 		$vars = array(
 		    'EE' => $EE, 
 		    'entries' => false, 
@@ -244,17 +243,20 @@ class Nsm_pp_workflow_mcp{
 		}
 		
 		$entries = false;
+
 		if($channel_ids){
 			$entries = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
 		}else{
 			$vars['error_tag'] = 'no_channels';
 		}
+
 		if($entries){
 			$vars['entries'] = array();
 			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 			$entries = $this->_returnEntries($entry_ids);
 			foreach($entries as $entry_row){
 				$entry = $entry_row;
+				unset($entry->EE);
 				$entry['edit_date'] = strtotime($entry['edit_date']);
 				$entry['days_in_review'] = ceil(($entry['last_review_date'] - mktime()) / (24 * 60 * 60));
 				if($entry['days_in_review'] < 1){ $entry['days_in_review'] = "None"; }
