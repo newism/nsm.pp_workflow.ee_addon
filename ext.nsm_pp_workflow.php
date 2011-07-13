@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Extension
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.10.0
+ * @version			0.10.1
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -267,7 +267,25 @@ class Nsm_pp_workflow_ext
 	 * @access public
 	 * @return void
 	 **/
-	public function update_extension($current=FALSE){}
+	public function update_extension($current=FALSE){
+		if($current == $this->version){
+			return false;
+		}
+
+		$EE =& get_instance();
+
+		require_once(PATH_THIRD."{$this->addon_id}/upd.{$this->addon_id}.php");
+		$version = $EE->db->get_where('modules', array('module_name' => ucfirst($this->addon_id)))->row('module_version');
+		$class = ucfirst($this->addon_id) . "_upd";
+		$updater = new $class();
+		$updater->update($version);
+
+		// Update the extension
+		$EE->db
+			->where('class', __CLASS__)
+			->update('extensions', array('version' => $this->version));
+		
+	}
 
 
 

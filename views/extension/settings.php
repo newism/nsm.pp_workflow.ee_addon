@@ -91,7 +91,7 @@ $EE =& get_instance();
 						/>
 					</td>
 					<th scope="row"><?= $channel_name; ?></th>
-					<td>
+					<td  style="width:170px">
 						<input
 							type="text"
 							name="<?= $input_prefix."[channels][".$channel_id."][next_review]"; ?>" 
@@ -104,7 +104,12 @@ $EE =& get_instance();
 							name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>" 
 							value="0" 
 						/>
-						<label>
+						<textarea
+							name="<?= $input_prefix."[channels][".$channel_id."][recipients]"; ?>" 
+							rows="3"
+							cols="30"
+						><?= form_prep($data['channels'][$channel_id]['recipients']); ?></textarea>
+						<div style="margin-top:5px"><label>
 							<input
 								type="checkbox"
 								name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>"
@@ -112,12 +117,7 @@ $EE =& get_instance();
 								<?= ($data['channels'][$channel_id]['email_author'] == 1 ? ' checked="checked"' : ""); ?>
 							/>
 							<?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_email_author') ?>
-						</label>
-						<textarea
-							name="<?= $input_prefix."[channels][".$channel_id."][recipients]"; ?>" 
-							rows="3"
-							cols="30"
-						><?= form_prep($data['channels'][$channel_id]['recipients']); ?></textarea>
+						</label></div>
 					</td>
 					<td>
 						<select name="<?= $input_prefix."[channels][".$channel_id."][state]"; ?>">

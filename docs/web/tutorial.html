@@ -1,0 +1,43 @@
+<h2>Getting started</h2>
+
+<p>Before you can use NSM Publish Plus you must configure the module using the <a href="/nsm-publish-plus-workflow/user-guide#toc-configuration:extension_settings">Extension Settings</a>.</p>
+
+<h2>Assigning an entry state and review period</h2>
+<div class="figure pull">
+	<img src="/uploads/content/images/addons/nsm-publish-plus-workflow/custom-field.png" width="610" alt="Dashboard" />
+</div>
+
+<p>Now that your extension settings are configured and the module ready for use, you can start setting assigning entry states and review dates.</p>
+
+<p>Create a new channel entry or edit an existing entry and open the <a href="/nsm-publish-plus-workflow/tutorial#toc-assigning_an_entry_state_and_review_period">'Workflow' tab</a>. The tab is shown in two sections, 'Entry state' and 'Next review date'. Once you have set the options in the Workflow form you can continue with the content submission.</p>
+
+<h3>Entry state</h3>
+
+<p>The entry state refers to the status of the content in Workflow, <em>not the ExpressionEngine status</em>, and is set as one of the following:</p>
+
+<ul>
+	<li><strong>Pending</strong> - Item is awaiting approval</li>
+	<li><strong>Approved</strong> - Item is approved for the website</li>
+	<li><strong>Review</strong> - The entry is deemed old and requires review for content relevancy</li>
+</ul>
+
+<p>When entries are reviewed by the module and a state of 'Pending' or 'Approved' is found and the entry is due for review the workflow state will be set to 'Review' and an email notification will be sent to the <a href="/nsm-publish-plus-workflow/user-guide#toc-configuration:extension_settings">nominated addresses</a>.</p>
+
+<h3>Next review date</h3>
+
+<p>Website administrators can specify the next review date in this part of the form. For new entries an estimated review date will be suggested based on the <a href="/nsm-publish-plus-workflow/user-guide#toc-configuration:extension_settings:channel_settings">extension settings</a> defined for the channel. Alternatively the administrator can specify their own date and time by using the 'New review date' radio button and input field.</p>
+
+<h2>Automating entry reviews</h2>
+
+<p>The URL shown in the <a href="/nsm-publish-plus-workflow/user-guide#toc-configuration:extension_settings:automation">automation</a> section of the <a href="/nsm-publish-plus-workflow/user-guide#toc-configuration:extension_settings">extension settings</a> is the URL that will need to be added to a server CRON job. Visiting / pinging this URL will search for channel entries that are due for review within the enabled channels.</p>
+<p>The automation URL will look something like: <code>http://yoursite.com/?ACT=24</code></p>
+<p>Each server setup has a unique CRON implementation. Ask your web host for more information or <a href="http://www.google.com.au/search?sourceid=chrome&amp;ie=UTF-8&amp;q=Setting+up+cron+jobs" rel="external">try Google</a>.
+
+<h2>Reviewing entries in the dashboard</h2>
+<div class="figure pull">
+	<img src="/uploads/content/images/addons/nsm-publish-plus-workflow/module-cp.png" width="610" alt="Dashboard" />
+</div>
+
+<p>When an entry is due for review it will appear in the NSM Publish Plus Workflow module dashboard. The dashboard is an easy place to find these entries. The information displayed includes the entry id, the entry name, a link to the edit form for the entry, the channel name, status, state, last edit date and review date.</p>
+
+<p>Click on the title of a channel entry to start editing the content. When you have finished updating your content in the Publish tab open the <a href="/nsm-publish-plus-workflow/tutorial#toc-assigning_an_entry_state_and_review_period">'Workflow' tab</a> and update the workflow state and set a new review date. You will most likely choose to use the 'Approved' state and 'Estimated review date from now' (second option) for Next review date. After you have submitted the content with a state other than 'Review' that entry will no longer appear in the module dashboard until it is due for the next review.</p>
