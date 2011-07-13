@@ -1,6 +1,11 @@
 NSM Publish Plus: Workflow - Changelog
 ======================================
 
+v0.10.1
+_______
+
+* [fix] Added update scripts to include Email entry author option into existing settings
+
 v0.10.0
 -------
 
