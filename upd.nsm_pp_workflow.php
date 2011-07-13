@@ -106,8 +106,7 @@ class Nsm_pp_workflow_upd
 		if ( ! function_exists('json_decode')){
 			$EE->load->library('Services_json');
 		}
-		
-		if($current < '0.10.0'){
+		if($current < '0.10.1'){
 			
 			$query = $EE->db->query("SELECT * FROM `exp_nsm_addon_settings` WHERE `addon_id` = '{$this->addon_id}'");
 			foreach($query->result_array() as $site){

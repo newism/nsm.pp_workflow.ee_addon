@@ -12,7 +12,7 @@
  */
 
 if(!defined('NSM_PP_WORKFLOW_VERSION')) {
-	define('NSM_PP_WORKFLOW_VERSION', '0.10.0');
+	define('NSM_PP_WORKFLOW_VERSION', '0.10.1');
 	define('NSM_PP_WORKFLOW_NAME', 'NSM Publish Plus: Workflow');
 	define('NSM_PP_WORKFLOW_ADDON_ID', 'nsm_pp_workflow');
 }
