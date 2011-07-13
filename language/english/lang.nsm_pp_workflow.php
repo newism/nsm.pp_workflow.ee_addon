@@ -115,6 +115,10 @@ $lang = array(
 	'nsm_pp_workflow_ext_ch_settings_columns_recipients' => 'Email Recipients (set multiple with new-lines)',
 	'nsm_pp_workflow_ext_ch_settings_columns_status' => 'Default Status',
 	
+	'nsm_pp_workflow_ext_ch_settings_no_channels' => 'No channels have been set up in your site.',
+	
+	'nsm_pp_workflow_ext_ch_settings_email_author' => 'Email entry author?',
+	
 	'nsm_pp_workflow_ext_email_settings_heading' => 'Notification Settings',
 	'nsm_pp_workflow_ext_email_settings_sender_name' => 'Sender Name',
 	'nsm_pp_workflow_ext_email_settings_sender_address' => 'Sender Email Address',

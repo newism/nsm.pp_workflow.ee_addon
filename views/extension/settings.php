@@ -70,6 +70,11 @@ $EE =& get_instance();
 				</tr>
 			</thead>
 			<tbody>
+			<?php if(!$channels) : ?>
+			<tr>
+				<td class="alert error" colspan="5"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_no_channels') ?></td>
+			</tr>
+			<?php else : ?>
 			<?php foreach($channels as $channel_id => $channel_name) : ?>
 				<tr>
 					<td style="text-align:center;">
@@ -94,6 +99,20 @@ $EE =& get_instance();
 						/>
 					</td>
 					<td>
+						<input
+							type="hidden"
+							name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>" 
+							value="0" 
+						/>
+						<label>
+							<input
+								type="checkbox"
+								name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>"
+								value="1"
+								<?= ($data['channels'][$channel_id]['email_author'] == 1 ? ' checked="checked"' : ""); ?>
+							/>
+							<?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_email_author') ?>
+						</label>
 						<textarea
 							name="<?= $input_prefix."[channels][".$channel_id."][recipients]"; ?>" 
 							rows="3"
@@ -116,6 +135,7 @@ $EE =& get_instance();
 					</td>
 				</tr>
 			<?php endforeach; ?>
+			<?php endif; ?>
 			</tbody>
 		</table>
 	</div>

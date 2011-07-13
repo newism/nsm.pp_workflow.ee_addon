@@ -83,8 +83,8 @@ class Nsm_pp_workflow_mcp{
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 		
+		//$updates = true;
 		$updates = Nsm_pp_workflow_model::updateEntryState($channel_ids);
-		$updates = true;
 		if(!$updates){
 			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
@@ -121,8 +121,6 @@ class Nsm_pp_workflow_mcp{
 	
 	private function _returnEntries($entry_ids)
 	{
-		$entries = array();
-		
 		$EE =& get_instance();
 		$table_name = Nsm_pp_workflow_model::getTableName();
 		// get the entries
@@ -134,25 +132,60 @@ class Nsm_pp_workflow_mcp{
 		return $targeted_entries->result_array();
 	}
 	
-	private function _processNotifications($entry_ids)
+	private function _getAuthorEmails($channel_ids, $entry_ids)
 	{
-		$emails_pending = 0;
-		$emails_sent = 0;
+		$emails = array();
 		
 		$EE =& get_instance();
-		
+		// get the entries
+		$EE->db->select('channel_titles.entry_id, exp_members.email');
+		$EE->db->from('exp_members');
+		$EE->db->join('channel_titles', 'channel_titles.author_id = exp_members.member_id', 'left');
+		$EE->db->where_in('channel_titles.channel_id', $channel_ids);
+		$EE->db->where_in('channel_titles.entry_id', $entry_ids);
+		$entry_authors = $EE->db->get();
+		foreach($entry_authors->result_array() as $row){
+			$emails[ $row['entry_id'] ] = $row['email'];
+		}
+		return $emails;
+	}
+	
+	private function _processNotifications($entry_ids)
+	{
+		$EE =& get_instance();
+		// prepare variables
+		$emails_pending = 0;
+		$emails_sent = 0;
+		$entry_authors = array();
+		// load required libraries and prep template class
 		$EE->load->library('email');
 		$EE->load->library('template', false, 'TMPL');
 		$this->EE->TMPL->site_ids = array('1');
-		
+		// get data that can be used by templates from entry ids
 		$entries = $this->_returnEntries($entry_ids);
+		// find channels that need to email the entry author
+		$email_author_channels = array();
+		foreach($this->settings['channels'] as $channel_id => $channel_settings){
+			if($channel_settings['email_author'] == 1){
+				$email_author_channels[] = $channel_id;
+			}
+		}
+		// need to collect author emails? get them now.
+		if(count($email_author_channels) > 0){
+			$entry_authors = $this->_getAuthorEmails($email_author_channels, $entry_ids);
+		}
+		// iterate over each entry and build email
 		foreach($entries as $entry_row){
 			$entry = $entry_row;
 			$channel_settings = $this->settings['channels'][$entry['channel_id']];
-			if(!isset($channel_settings['enabled']) || $channel_settings['enabled'] == 0){
-				continue;
-			}
 			$email_recipients = explode("\n", $channel_settings['recipients']);
+			// does the entry have an author email ready? then add it
+			if(isset($entry_authors[ $entry['entry_id'] ])){
+				// is email address already used?
+				if(!in_array($entry_authors[ $entry['entry_id'] ], $email_recipients)){
+					$email_recipients[] = $entry_authors[ $entry['entry_id'] ];
+				}
+			}
 			$email_from_name = $this->settings['notifications']['from_name'];
 			$email_from_address = $this->settings['notifications']['from_email'];
 			$email_subject = $this->settings['notifications']['subject'];
@@ -179,7 +212,6 @@ class Nsm_pp_workflow_mcp{
 			$EE->email->subject($email_subject);
 
 			// set the email message body and parse variables
-			//$tagdata = $EE->TMPL->fetch_template($template['group'], $template['name'], FALSE);
 			$tagdata = $EE->TMPL->remove_ee_comments($email_message);
 			$tagdata = $EE->TMPL->convert_xml_declaration($email_message);
 			$tagdata = $EE->TMPL->parse_variables_row($tagdata, $entry);
