@@ -38,7 +38,7 @@ $EE =& get_instance();
 	<?php if($message) : ?>
 		<div class="alert success"><?php print($message); ?></div>
 	<?php endif; ?>
-	
+	<?php /*
 	<div class="tg">
 		<h2>Enable?</h2>
 		<table class="data NSM_Stripeable">
@@ -49,19 +49,7 @@ $EE =& get_instance();
 				</tr>
 			</tbody>
 		</table>
-	</div>
-
-	<div class="tg">
-		<h2>Automation</h2>
-		<div class="alert info">
-		To trigger review updates use this URL in a cron job: 
-		<strong>
-			<a href="<?= $EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'review_entries'); ?>">
-				<?= $EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'review_entries'); ?>
-			</a>
-		</strong>.
-		</div>
-	</div>
+	</div>*/ ?>
 
 	<!-- 
 	===============================
@@ -70,17 +58,23 @@ $EE =& get_instance();
 	-->
 	
 	<div class="tg">
-		<h2>Channel settings</h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_heading') ?></h2>
 		<table class="data NSM_Stripeable">
 			<thead>
 				<tr>
-					<th scope="col" style="width:28px;">Enable?</th>
-					<th scope="col">Channel</th>
-					<th scope="col">Days till review</th>
-					<th scope="col">Email recipients</th>
+					<th scope="col" style="width:28px;"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_columns_enable') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_columns_channel') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_columns_days') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_columns_recipients') ?></th>
+					<th scope="col"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_columns_status') ?></th>
 				</tr>
 			</thead>
 			<tbody>
+			<?php if(!$channels) : ?>
+			<tr>
+				<td class="alert error" colspan="5"><?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_no_channels') ?></td>
+			</tr>
+			<?php else : ?>
 			<?php foreach($channels as $channel_id => $channel_name) : ?>
 				<tr>
 					<td style="text-align:center;">
@@ -105,25 +99,54 @@ $EE =& get_instance();
 						/>
 					</td>
 					<td>
+						<input
+							type="hidden"
+							name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>" 
+							value="0" 
+						/>
+						<label>
+							<input
+								type="checkbox"
+								name="<?= $input_prefix."[channels][".$channel_id."][email_author]"; ?>"
+								value="1"
+								<?= ($data['channels'][$channel_id]['email_author'] == 1 ? ' checked="checked"' : ""); ?>
+							/>
+							<?= $EE->lang->line('nsm_pp_workflow_ext_ch_settings_email_author') ?>
+						</label>
 						<textarea
 							name="<?= $input_prefix."[channels][".$channel_id."][recipients]"; ?>" 
 							rows="3"
 							cols="30"
 						><?= form_prep($data['channels'][$channel_id]['recipients']); ?></textarea>
 					</td>
+					<td>
+						<select name="<?= $input_prefix."[channels][".$channel_id."][state]"; ?>">
+						<?php foreach($entry_states as $state) : ?>
+							<option
+								value="<?= $state ?>"
+								<?php if(isset($data['channels'][$channel_id]['state']) && $data['channels'][$channel_id]['state'] == $state) : ?>
+									selected="selected"
+								<?php endif; ?>
+							>
+								<?= $EE->lang->line('nsm_pp_workflow_tab_review_state_'.$state.'_label') ?>
+							</option>
+						<?php endforeach; ?>
+						</select>
+					</td>
 				</tr>
 			<?php endforeach; ?>
+			<?php endif; ?>
 			</tbody>
 		</table>
 	</div>
 	
 
 	<div class="tg">
-		<h2>Notification settings</h2>
+		<h2><?= $EE->lang->line('nsm_pp_workflow_ext_email_settings_heading') ?></h2>
 		<table class="data NSM_Stripeable">
 			<tbody>
 				<tr>
-					<th scope="row">Sender name</th>
+					<th scope="row"><?= $EE->lang->line('nsm_pp_workflow_ext_email_settings_sender_name') ?></th>
 					<td><input
 						type="text"
 						name="<?= $input_prefix."[notifications][from_name]"; ?>" 
@@ -131,7 +154,7 @@ $EE =& get_instance();
 					/></td>
 				</tr>
 				<tr>
-					<th scope="row">Sender address</th>
+					<th scope="row"><?= $EE->lang->line('nsm_pp_workflow_ext_email_settings_sender_address') ?></th>
 					<td><input
 						type="text"
 						name="<?= $input_prefix."[notifications][from_email]"; ?>" 
@@ -139,7 +162,7 @@ $EE =& get_instance();
 					/></td>
 				</tr>
 				<tr>
-					<th scope="row">Email subject</th>
+					<th scope="row"><?= $EE->lang->line('nsm_pp_workflow_ext_email_settings_email_subject') ?></th>
 					<td><input
 						type="text"
 						name="<?= $input_prefix."[notifications][subject]"; ?>" 
@@ -147,7 +170,7 @@ $EE =& get_instance();
 					/></td>
 				</tr>
 				<tr>
-					<th scope="row">Email message</th>
+					<th scope="row"><?= $EE->lang->line('nsm_pp_workflow_ext_email_settings_email_message') ?></th>
 					<td>
 						<textarea
 							name="<?= $input_prefix."[notifications][message]"; ?>" 
@@ -159,6 +182,17 @@ $EE =& get_instance();
 			</tbody>
 		</table>
 	</div>
+
+	<div class="tg">
+		<h2><?= $EE->lang->line('nsm_pp_workflow_ext_automation_heading') ?></h2>
+		<div class="alert info">
+		<?= sprintf(
+				$EE->lang->line('nsm_pp_workflow_ext_automation_message'),
+				$EE->config->item('site_url').'?ACT='.$EE->cp->fetch_action_id('Nsm_pp_workflow_mcp', 'cron_review_entries')
+			) ?>
+		</div>
+	</div>
+
 
 	<!-- 
 	===============================

@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow CP 
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.10.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -19,7 +19,10 @@ class Nsm_pp_workflow_mcp{
 	public static $addon_id = NSM_PP_WORKFLOW_ADDON_ID;
 
 	private $pages = array(
-		"index"
+		"index",
+		"find_pending",
+		"find_approved",
+		"mcp_review_entries"
 	);
 
 	public function __construct() {
@@ -32,8 +35,19 @@ class Nsm_pp_workflow_mcp{
 		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$this->settings = $nsm_pp_ext->settings;
 	}
-	
-	
+
+	public function mcp_review_entries()
+	{
+		$review_status = $this->review_entries();
+		$this->EE->session->set_flashdata('message_'.$review_status[0], $review_status[1]);
+		$this->EE->functions->redirect( self::_route('index') );
+	}
+
+	public function cron_review_entries(){
+		$review_status = $this->review_entries();
+		die( $review_status[1] );
+	}
+
 	public function review_entries()
 	{	
 		$EE =& get_instance();
@@ -53,22 +67,26 @@ class Nsm_pp_workflow_mcp{
 		}
 		
 		$channel_ids = $this->_returnChannelIDs($this->settings);
+		if(!count($channel_ids)){
+			// no channels set
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_no_channels'));
+		}
 		
 		$entries = Nsm_pp_workflow_model::findByReviewNow($channel_ids);
 		if(count($entries) == 0){
 			// returned no entries, tell user
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
+			return array('success', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_none'));
 		}elseif(!$entries){
 			// returned false, error
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_select_error'));
 		}
 		
 		$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
 		
+		//$updates = true;
 		$updates = Nsm_pp_workflow_model::updateEntryState($channel_ids);
-		$updates = true;
 		if(!$updates){
-			die($EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
+			return array('error', $EE->lang->line('nsm_pp_workflow_review_entries_db_update_error'));
 		}
 		
 		$notification_status = $this->_processNotifications($entry_ids);
@@ -78,14 +96,14 @@ class Nsm_pp_workflow_mcp{
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}else{
 			$message = sprintf(
 							$EE->lang->line('nsm_pp_workflow_review_entries_email_error'), 
 							$notification_status['sent'],
 							$notification_status['pending']
 						);
-			die($message);
+			return array('success', $message);
 		}
 	}
 	
@@ -103,39 +121,71 @@ class Nsm_pp_workflow_mcp{
 	
 	private function _returnEntries($entry_ids)
 	{
-		$entries = array();
-		
 		$EE =& get_instance();
 		$table_name = Nsm_pp_workflow_model::getTableName();
 		// get the entries
 		$EE->db->from($table_name);
 		$EE->db->join('channel_titles', 'channel_titles.entry_id = '.$table_name.'.entry_id', 'left');
 		$EE->db->join('channels', 'channel_titles.channel_id = channels.channel_id', 'left');
-		$EE->db->where_in('id', $entry_ids);
+		$EE->db->where_in('channel_titles.entry_id', $entry_ids);
 		$targeted_entries = $EE->db->get();
-		
 		return $targeted_entries->result_array();
+	}
+	
+	private function _getAuthorEmails($channel_ids, $entry_ids)
+	{
+		$emails = array();
+		
+		$EE =& get_instance();
+		// get the entries
+		$EE->db->select('channel_titles.entry_id, exp_members.email');
+		$EE->db->from('exp_members');
+		$EE->db->join('channel_titles', 'channel_titles.author_id = exp_members.member_id', 'left');
+		$EE->db->where_in('channel_titles.channel_id', $channel_ids);
+		$EE->db->where_in('channel_titles.entry_id', $entry_ids);
+		$entry_authors = $EE->db->get();
+		foreach($entry_authors->result_array() as $row){
+			$emails[ $row['entry_id'] ] = $row['email'];
+		}
+		return $emails;
 	}
 	
 	private function _processNotifications($entry_ids)
 	{
+		$EE =& get_instance();
+		// prepare variables
 		$emails_pending = 0;
 		$emails_sent = 0;
-		
-		$EE =& get_instance();
-		
+		$entry_authors = array();
+		// load required libraries and prep template class
 		$EE->load->library('email');
 		$EE->load->library('template', false, 'TMPL');
 		$this->EE->TMPL->site_ids = array('1');
-		
+		// get data that can be used by templates from entry ids
 		$entries = $this->_returnEntries($entry_ids);
+		// find channels that need to email the entry author
+		$email_author_channels = array();
+		foreach($this->settings['channels'] as $channel_id => $channel_settings){
+			if($channel_settings['email_author'] == 1){
+				$email_author_channels[] = $channel_id;
+			}
+		}
+		// need to collect author emails? get them now.
+		if(count($email_author_channels) > 0){
+			$entry_authors = $this->_getAuthorEmails($email_author_channels, $entry_ids);
+		}
+		// iterate over each entry and build email
 		foreach($entries as $entry_row){
 			$entry = $entry_row;
 			$channel_settings = $this->settings['channels'][$entry['channel_id']];
-			if(!isset($channel_settings['enabled']) || $channel_settings['enabled'] == 0){
-				continue;
-			}
 			$email_recipients = explode("\n", $channel_settings['recipients']);
+			// does the entry have an author email ready? then add it
+			if(isset($entry_authors[ $entry['entry_id'] ])){
+				// is email address already used?
+				if(!in_array($entry_authors[ $entry['entry_id'] ], $email_recipients)){
+					$email_recipients[] = $entry_authors[ $entry['entry_id'] ];
+				}
+			}
 			$email_from_name = $this->settings['notifications']['from_name'];
 			$email_from_address = $this->settings['notifications']['from_email'];
 			$email_subject = $this->settings['notifications']['subject'];
@@ -162,7 +212,6 @@ class Nsm_pp_workflow_mcp{
 			$EE->email->subject($email_subject);
 
 			// set the email message body and parse variables
-			//$tagdata = $EE->TMPL->fetch_template($template['group'], $template['name'], FALSE);
 			$tagdata = $EE->TMPL->remove_ee_comments($email_message);
 			$tagdata = $EE->TMPL->convert_xml_declaration($email_message);
 			$tagdata = $EE->TMPL->parse_variables_row($tagdata, $entry);
@@ -185,6 +234,19 @@ class Nsm_pp_workflow_mcp{
 	
 	
 	public function index(){
+		return $this->dashboard('review', 'index');
+	}
+	
+	public function find_pending(){
+		return $this->dashboard('pending', 'find_pending');
+	}
+	
+	public function find_approved(){
+		return $this->dashboard('approved', 'find_approved');
+	}
+	
+	
+	public function dashboard($find_state = 'review', $page = 'index'){
 		$EE =& get_instance();
 		$EE->lang->loadfile('nsm_pp_workflow');
 		$EE->load->helper('date');
@@ -197,26 +259,34 @@ class Nsm_pp_workflow_mcp{
 			$nsm_pp_ext = new Nsm_pp_workflow_ext();
 			$this->settings = $nsm_pp_ext->settings;
 		}
-		
+
 		$channel_ids = $this->_returnChannelIDs($this->settings);
-		
-		$vars = array('EE' => $EE, 'entries' => false, 'error_tag' => 'no_results');
+
+		$vars = array(
+		    'EE' => $EE, 
+		    'entries' => false, 
+		    'error_tag' => $find_state.'_no_results', 
+		    'filter_state' => $find_state,
+		    'extension_settings_url' => BASE.AMP.'C=addons_extensions'.AMP.'M=extension_settings'.AMP.'file=nsm_pp_workflow'
+		);
 		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$entries = false;
+		$workflow_objects = false;
+
 		if($channel_ids){
-			$entries = Nsm_pp_workflow_model::findStateReview($channel_ids);
+			$workflow_objects = Nsm_pp_workflow_model::findByState($find_state, $channel_ids);
 		}else{
 			$vars['error_tag'] = 'no_channels';
 		}
-		if($entries){
+
+		if($workflow_objects){
 			$vars['entries'] = array();
-			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($entries);
-			$entries = $this->_returnEntries($entry_ids);
-			foreach($entries as $entry_row){
+			$entry_ids = Nsm_pp_workflow_model::getCollectionEntryIds($workflow_objects);
+			$channel_entries = $this->_returnEntries($entry_ids);
+			foreach($channel_entries as $entry_row){
 				$entry = $entry_row;
 				$entry['edit_date'] = strtotime($entry['edit_date']);
 				$entry['days_in_review'] = ceil(($entry['last_review_date'] - mktime()) / (24 * 60 * 60));
@@ -227,18 +297,18 @@ class Nsm_pp_workflow_mcp{
 				$vars['entries'][] = $entry;
 			}
 		}
-		
 		$out = $this->EE->load->view("module/index", $vars, TRUE);
-		return $this->_renderLayout("index", $out);
+		return $this->_renderLayout($page, $out);
 	}
+	
 
 	public function _renderLayout($page, $out = FALSE) {
-		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line("{$page}_page_title"));
+		$this->EE->cp->set_variable('cp_page_title', $this->EE->lang->line(self::$addon_id."_{$page}_page_title"));
 		$this->EE->cp->set_breadcrumb(self::_route(), $this->EE->lang->line('nsm_pp_workflow_module_name'));
 
 		$nav = array();
 		foreach ($this->pages as $page) {
-			$nav[lang("{$page}_nav_title")] = self::_route($page);
+			$nav[lang(self::$addon_id."_{$page}_nav_title")] = self::_route($page);
 		}
 		$this->EE->cp->set_right_nav($nav);
 		return "<div class='mor'>{$out}</div>";

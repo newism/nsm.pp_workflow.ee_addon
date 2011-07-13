@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * Install / Uninstall and updates the modules
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.10.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -23,7 +23,7 @@ class Nsm_pp_workflow_upd
 	private $has_tabs = true;
 
 	private $actions = array(
-		'Nsm_pp_workflow_mcp::review_entries'
+		'Nsm_pp_workflow_mcp::cron_review_entries'
 	);
 	private $models = array(
 		'Nsm_pp_workflow_model'
@@ -99,7 +99,15 @@ class Nsm_pp_workflow_upd
 	 * @return Boolean FALSE if no update is necessary, TRUE if it is.
 	 **/
 	public function update($current = FALSE) {
-		return FALSE;
+		if($current == $this->version){
+			return false;
+		}
+		// Update the extension
+		$EE =& get_instance();
+		$EE->db
+			->where('module_name', substr(__CLASS__, 0, -4) )
+			->update('modules', array('module_version' => $this->version));
+		return true;
 	}
 
 	/**

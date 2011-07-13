@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Extension
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.10.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -42,7 +42,13 @@ class Nsm_pp_workflow_ext
 	);
 
 
-	public $default_channel_settings = array();
+	public $default_channel_settings = array(
+		'enabled' => 0,
+		'next_review' => 60,
+		'email_author' => 0,
+		'recipients' => '',
+		'state' => ''
+	);
 	public $default_member_group_settings = array();
 
 
@@ -128,13 +134,16 @@ class Nsm_pp_workflow_ext
 		$EE->lang->loadfile($this->addon_id);
 		$EE->load->library($this->addon_id."_helper");
 		$EE->load->helper('form');
-
+		// No site id, use the current one.
+		$site_id = SITE_ID;
 		// Create the variable array
 		$vars = array(
 			'addon_id' => $this->addon_id,
+			'channels' => false,
 			'error' => FALSE,
 			'input_prefix' => __CLASS__,
 			'message' => FALSE,
+			'entry_states' => array('pending', 'approved', 'review')
 		);
 
 		// Are there settings posted from the form?
@@ -156,115 +165,19 @@ class Nsm_pp_workflow_ext
 		}
 		
 		$vars["data"] = $data;
-		//$vars["channel_data_map"] = $this->_settings_form_channel_data_map($this->settings['channel_data_map']);
-		//$vars["member_data_map"] = $this->_settings_form_member_data_map($this->settings['member_data_map']);
-		
 		$get_channels = $EE->db->select('channel_id, channel_title')->order_by('channel_title')->get('channels');
-		foreach($get_channels->result() as $row){
-			$vars['channels'][$row->channel_id] = $row->channel_title;
-			
-			if(!isset($vars['data']['channels'][ $row->channel_id ])){
-				$vars['data']['channels'][ $row->channel_id ] = array(
-																		'enabled' => 0,
-																		'next_review' => 60,
-																		'recipients' => ''
-																	);
+		
+		$channels = $EE->channel_model->get_channels($site_id);
+		if($channels->num_rows() > 0){
+			$vars['channels'] = array();
+			foreach($channels->result() as $row){
+				$vars['channels'][$row->channel_id] = $row->channel_title;
 			}
 		}
-		
 		// Return the view.
 		return $EE->load->view('extension/settings', $vars, TRUE);
 	}
 
-	/**
-	 * Data Mapping to custom fields
-	 * 
-	 * @access private
-	 * @param $data_map array Multi-dimensional array
-	 */
-	private function _settings_form_channel_data_map(array $data_map) {
-
-		$EE =& get_instance();
-		$EE->load->library($this->addon_id."_helper");
-
-		$sorted_fields = array();
-
-		$vars = array(
-			'input_id' => $this->addon_id."_channel_data_map",
-			'input_prefix' => __CLASS__."[channel_data_map]",
-			'data_map' => $data_map
-		);
-
-		$vars['channels'] = $EE->channel_model->get_channels()->result();
-		$EE->load->model("field_model");
-		$field_query = $EE->db->query("SELECT 
-											w.channel_id as channel_id, 
-											wf.group_id as group_id, 
-											wf.field_id as field_id, 
-											wf.field_label as field_label, 
-											wf.field_type as field_type
-										FROM `exp_channels` as w
-										INNER JOIN `exp_channel_fields` as wf
-										ON w.field_group = wf.group_id
-										WHERE w.site_id = ".SITE_ID."
-										ORDER BY w.channel_id, wf.group_id, wf.field_order"
-									);
-
-		if($field_query->num_rows > 0) {
-			foreach ($field_query->result() as $field) {
-				$sorted_fields[$field->channel_id][] = $field;
-			}
-		}
-
-		$js = "$('#{$vars['input_id']}_channel_id').NSM_AttributeAssigner({prefix: '{$vars['input_id']}', cf_data: ". json_encode($sorted_fields) . "});";
-
-		if(isset($data_map['channel_id'])) {
-			foreach ($data_map['fields'] as $field_name => $mapped_field_id) {
-				if(!is_array($mapped_field_id)) {
-					$js .= "$('#{$vars['input_id']}_{$field_name}').val('{$mapped_field_id}');";
-				} else {
-					foreach($mapped_field_id as $sub_name => $sub_field_id) {
-						$js .= "$('#{$vars['input_id']}_{$field_name}_{$sub_name}').val('{$sub_field_id}');";
-					}
-				}
-			}
-		}
-
-		$EE->nsm_pp_workflow_helper->addJS($js, array("file"=>FALSE));
-		return $EE->load->view('extension/_settings_channel_data_map', $vars, TRUE);
-	}
-
-	/**
-	 * Data Mapping to member fields
-	 * 
-	 * @access private
-	* @param array $data_map The attributes we need to make, e.g array("mobile_phone_field_id" => "12", "limit" => "23")
-	 */
-	private function _settings_form_member_data_map(array $data_map) {
-
-		$EE =& get_instance();
-		$EE->load->library($this->addon_id."_helper");
-
-		$vars = array(
-			'input_id' => $this->addon_id."_member_data_map",
-			'input_prefix' => __CLASS__."[member_data_map]",
-			'data_map' => $data_map
-		);
-
-		$vars['member_fields'] = array();
-
-		$EE->db->from('member_fields');
-		$EE->db->order_by('m_field_order');
-		$member_fields_query = $EE->db->get();
-
-		if($member_fields_query->num_rows > 0) {
-			foreach ($member_fields_query->result_array() as $field) {
-				$vars['member_fields'][$field['m_field_id']] = $field;
-			}
-		}
-
-		return $EE->load->view('extension/_settings_member_data_map', $vars, TRUE);
-	}
 
 	/**
 	 * Builds default settings for the site
@@ -276,35 +189,25 @@ class Nsm_pp_workflow_ext
 	private function _buildDefaultSiteSettings($site_id = FALSE) {
 
 		$EE =& get_instance();
-		$default_settings = $this->default_site_settings;
+		$site_settings = $this->default_site_settings;
 
 		// No site id, use the current one.
 		if(!$site_id) {
 			$site_id = SITE_ID;
 		}
-		/*
+		
 		// Channel preferences (if required)
-		if(isset($this->default_settings["channels"])) {
+		if(isset($site_settings["channels"])) {
 			$channels = $EE->channel_model->get_channels($site_id);
 			if ($channels->num_rows() > 0) {
 				foreach($channels->result() as $channel) {
-					$default_settings['channels'][$channel->channel_id] = $this->_buildChannelSettings($channel->channel_id);
+					$site_settings['channels'][$channel->channel_id] = $this->_buildChannelSettings($channel->channel_id);
 				}
 			}
 		}
 
-		// Member group settings (if required)
-		if(isset($this->default_settings["member_groups"])) {
-			$member_groups = $EE->member_model->get_member_groups();
-			if ($member_groups->num_rows() > 0) {
-				foreach($member_groups->result() as $member_group) {
-					$default_settings['member_groups'][$member_group->group_id] = $this->_buildMemberGroupSettings($member_group->group_id);
-				}
-			}
-		}
-		*/
 		// return settings
-		return $default_settings;
+		return $site_settings;
 	}
 
 	/**
@@ -458,7 +361,7 @@ class Nsm_pp_workflow_ext
 			if ($settings_query->num_rows()) {
 
 				if ( ! function_exists('json_decode')) {
-					$$EE->load->library('Services_json');
+					$EE->load->library('Services_json');
 				}
 
 				$settings = json_decode($settings_query->row()->settings, TRUE);
@@ -468,15 +371,6 @@ class Nsm_pp_workflow_ext
 			// no settings for the site
 			else {
 				$settings = $this->_buildDefaultSiteSettings(SITE_ID);
-				
-				$get_channels = $EE->db->select('channel_id, channel_title')->order_by('channel_title')->get('channels');
-				foreach($get_channels->result() as $row){
-					$settings['channels'][ $row->channel_id ] = array(
-																			'enabled' => 0,
-																			'next_review' => 60,
-																			'recipients' => ''
-																		);
-				}
 				$this->_saveSettings($settings);
 				log_message('info', __CLASS__ . " : " . __METHOD__ . ' creating new site settings');
 			}

@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Tab
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.0.1
+ * @version			0.10.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -59,10 +59,37 @@ class Nsm_pp_workflow_tab
 		$nsm_pp_ext = new Nsm_pp_workflow_ext();
 		$settings = $nsm_pp_ext->settings;
 		
-		if(isset($settings['channels'][$channel_id])){
+		// is this channel being managed by pp_workflow?
+		if(!isset($settings['channels'][$channel_id]) || $settings['channels'][$channel_id]['enabled'] == 0){
+			$field_settings[] = array(
+				'field_id' => 'nsm_pp_workflow', // This must match a key in Nsm_pp_workflow_upd::tabs()
+				'field_type' => 'nsm_pp_workflow',
+				'field_label' => $EE->lang->line('nsm_pp_workflow_tab_review_date_label'),
+				'field_instructions' => '',
+				'field_required' => '',
+				'field_data' => array('channel_enabled' => false),
+				'field_list_items' => '',
+				'options' => '',
+				'selected' => '',
+				'field_fmt' => '',
+				'field_show_fmt' => 'n',
+				'field_pre_populate' => '',
+				'field_text_direction' => 'ltr',
+				'field_channel_id' => $channel_id
+			);
+			return $field_settings;
+		}
+		
+		if(isset($settings['channels'][$channel_id]['next_review'])){
 			$days_till_next_review = intval($settings['channels'][$channel_id]['next_review']);
 		}else{
-			$days_till_next_review = intval($settings['next_review_fallback']);
+			$days_till_next_review = 60;
+		}
+		
+		if(isset($settings['channels'][$channel_id]['state'])){
+			$default_state = $settings['channels'][$channel_id]['state'];
+		}else{
+			$default_state = 'pending';
 		}
 		
 		$EE->load->helper('date');
@@ -73,7 +100,9 @@ class Nsm_pp_workflow_tab
 		
 		// defaults
 		$default_data = array(
-			'state' => 'pending',
+			'channel_enabled' => true,
+			'state' => $default_state,
+			'default_state' => $default_state,
 			'days_till_review' => $days_till_next_review,
 			'allow' => array('est_now_review_date'),
 			'last_review_date' => 0,
