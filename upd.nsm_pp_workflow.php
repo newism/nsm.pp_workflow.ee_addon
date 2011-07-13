@@ -99,7 +99,15 @@ class Nsm_pp_workflow_upd
 	 * @return Boolean FALSE if no update is necessary, TRUE if it is.
 	 **/
 	public function update($current = FALSE) {
-		return FALSE;
+		if($current == $this->version){
+			return false;
+		}
+		// Update the extension
+		$EE =& get_instance();
+		$EE->db
+			->where('module_name', substr(__CLASS__, 0, -4) )
+			->update('modules', array('module_version' => $this->version));
+		return true;
 	}
 
 	/**
