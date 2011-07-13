@@ -267,7 +267,25 @@ class Nsm_pp_workflow_ext
 	 * @access public
 	 * @return void
 	 **/
-	public function update_extension($current=FALSE){}
+	public function update_extension($current=FALSE){
+		if($current == $this->version){
+			return false;
+		}
+
+		$EE =& get_instance();
+
+		require_once(PATH_THIRD."{$this->addon_id}/upd.{$this->addon_id}.php");
+		$version = $EE->db->get_where('modules', array('module_name' => ucfirst($this->addon_id)))->row('module_version');
+		$class = ucfirst($this->addon_id) . "_upd";
+		$updater = new $class();
+		$updater->update($version);
+
+		// Update the extension
+		$EE->db
+			->where('class', __CLASS__)
+			->update('extensions', array('version' => $this->version));
+		
+	}
 
 
 

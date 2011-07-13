@@ -99,11 +99,38 @@ class Nsm_pp_workflow_upd
 	 * @return Boolean FALSE if no update is necessary, TRUE if it is.
 	 **/
 	public function update($current = FALSE) {
+		$EE =& get_instance();
 		if($current == $this->version){
 			return false;
 		}
+		if ( ! function_exists('json_decode')){
+			$EE->load->library('Services_json');
+		}
+		
+		if($current < '0.10.0'){
+			
+			$query = $EE->db->query("SELECT * FROM `exp_nsm_addon_settings` WHERE `addon_id` = '{$this->addon_id}'");
+			foreach($query->result_array() as $site){
+				// decode the settings
+				$site["settings"] = json_decode($site["settings"], true);
+
+				// Update channel settings to include the email author setting
+				foreach ($site["settings"]["channels"] as &$channel) {
+					$channel["email_author"] = isset($channel["email_author"]) ? $channel["email_author"] : 0;
+				}
+				// encode the json and save back to DB
+				$site["settings"] = $EE->javascript->generate_json($site["settings"], true);
+
+				$query = $EE->db->update(
+							'exp_nsm_addon_settings',
+							array('settings' => $site["settings"]),
+							array(
+								'addon_id' => $this->addon_id,
+								'site_id' => $site['site_id']
+							));
+			}
+		}
 		// Update the extension
-		$EE =& get_instance();
 		$EE->db
 			->where('module_name', substr(__CLASS__, 0, -4) )
 			->update('modules', array('module_version' => $this->version));
