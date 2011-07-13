@@ -4,7 +4,7 @@
  * NSM Publish Plus: Workflow Language File
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.9.0
+ * @version			0.10.0
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
