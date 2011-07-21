@@ -263,7 +263,11 @@ class Nsm_pp_workflow_tab
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
-		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
-		$nsm_pp_model->delete();
+		foreach($entry_ids['entry_ids'] as $entry_id){
+			$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
+			if($nsm_pp_model !== false){
+				$nsm_pp_model->delete();
+			}
+		}
 	}
 }
