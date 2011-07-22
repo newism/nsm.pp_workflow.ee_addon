@@ -6,7 +6,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * NSM Publish Plus: Workflow Tab
  *
  * @package			NsmPublishPlusWorkflow
- * @version			0.10.1
+ * @version			0.10.2
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
@@ -263,7 +263,11 @@ class Nsm_pp_workflow_tab
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
-		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
-		$nsm_pp_model->delete();
+		foreach($entry_ids['entry_ids'] as $entry_id){
+			$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
+			if($nsm_pp_model !== false){
+				$nsm_pp_model->delete();
+			}
+		}
 	}
 }

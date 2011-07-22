@@ -17,7 +17,7 @@ require PATH_THIRD.'nsm_pp_workflow/config.php';
  * $this->EE->nsm_pp_workflow_helper->addJS('../lib/jquery.cookie.js');
  * 
  * @package			NsmPublishPlusWorkflow
- * @version			0.10.1
+ * @version			0.10.2
  * @author			Leevi Graham <http://leevigraham.com>
  * @copyright 		Copyright (c) 2007-2010 Newism <http://newism.com.au>
  * @license 		Commercial - please see LICENSE file included with this distribution
