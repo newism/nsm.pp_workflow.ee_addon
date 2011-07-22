@@ -1,6 +1,11 @@
 NSM Publish Plus: Workflow - Changelog
 ======================================
 
+v0.10.2
+_______
+
+* [fix] Corrected function that is called via content entry deletion hook
+
 v0.10.1
 _______
 
