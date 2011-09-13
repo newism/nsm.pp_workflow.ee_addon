@@ -194,7 +194,7 @@ class Nsm_pp_workflow_mcp{
 			$entry['entry_url'] = $EE->functions->create_url($entry['comment_url'].$entry['url_title']);
 			$entry['cp_entry_url'] = $EE->config->item('cp_url').
 										'?D=cp&C=content_publish&M=entry_form'.
-										'&channel_id='.$entry['entry_id'].'&entry_id='.$entry['channel_id'];
+										'&channel_id='.$entry['channel_id'].'&entry_id='.$entry['entry_id'];
 			
 			$emails_pending += count($email_recipients);
 			
