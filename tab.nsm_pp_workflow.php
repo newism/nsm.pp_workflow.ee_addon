@@ -212,6 +212,8 @@ class Nsm_pp_workflow_tab
 		$EE =& get_instance();
 		$EE->load->helper('date');
 		
+		$channel_id = $params['meta']['channel_id'];
+		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
@@ -242,8 +244,8 @@ class Nsm_pp_workflow_tab
 			$nsm_pp_model = new Nsm_pp_workflow_model($model_data);
 			$nsm_pp_model->add();
 		}
-		
 		$new_review_date = $data[ $data['use_date'] ];
+		
 		if($data['use_date'] == 'new_review_date'){
 			$new_review_date = human_to_unix($new_review_date);
 		}
