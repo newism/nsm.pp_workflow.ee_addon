@@ -218,6 +218,15 @@ class Nsm_pp_workflow_tab
 		
 		$data = $params['mod_data']['nsm_pp_workflow'];
 		
+		if(!class_exists('Nsm_pp_workflow_ext')){
+			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
+		}
+		$nsm_pp_ext = new Nsm_pp_workflow_ext();
+		$settings = $nsm_pp_ext->settings;
+		// is this channel being managed by pp_workflow?
+		if(!isset($settings['channels'][$channel_id]) || $settings['channels'][$channel_id]['enabled'] == 0){
+			return true;
+		}
 		
 		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($params['entry_id']);
 		// no existing entry? make one.
