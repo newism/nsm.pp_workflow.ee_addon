@@ -1,4 +1,4 @@
-<div class="mor cf">
+<div class="mor cf <?= ( ! $data['channel_enabled'] ? 'nsm_inactive_tab' : '') ?>" data-addonid="nsm_pp_workflow">
 	<?php if(!$data['channel_enabled']) : ?>
 	<div class="alert info">
 		<?= sprintf($EE->lang->line('nsm_pp_workflow_tab_review_not_enabled'), $extension_settings_url); ?>
