@@ -71,6 +71,9 @@ class Nsm_pp_workflow_ext
 			define('SITE_ID', $EE->config->item('site_id'));
 		}
 
+		// Init the cache
+		$this->_initCache();
+		
 		// Load the addons model and check if the the extension is installed
 		// Get the settings if it's installed
 		$EE->load->model('addons_model');
@@ -78,8 +81,6 @@ class Nsm_pp_workflow_ext
 			$this->settings = $this->_getSettings();
 		}
 
-		// Init the cache
-		$this->_initCache();
 	}
 
 	/**
@@ -94,12 +95,12 @@ class Nsm_pp_workflow_ext
 
 		// Sort out our cache
 		// If the cache doesn't exist create it
-		if (! isset($EE->session->cache[$this->addon_id])) {
-			$EE->session->cache[$this->addon_id] = array();
+		if (empty($EE->session->cache[$this->addon_id][SITE_ID])) {
+			$EE->session->cache[$this->addon_id][SITE_ID] = array();
 		}
 
-		// Assig the cache to a local class variable
-		$this->cache =& $EE->session->cache[$this->addon_id];
+		// Assign the cache to a local class variable
+		$this->cache =& $EE->session->cache[$this->addon_id][SITE_ID];
 	}
 
 
@@ -164,7 +165,6 @@ class Nsm_pp_workflow_ext
 			$data = $this->settings;
 		}
 		
-		$vars["data"] = $data;
 		$get_channels = $EE->db->select('channel_id, channel_title')->order_by('channel_title')->get('channels');
 		
 		$channels = $EE->channel_model->get_channels($site_id);
@@ -172,8 +172,12 @@ class Nsm_pp_workflow_ext
 			$vars['channels'] = array();
 			foreach($channels->result() as $row){
 				$vars['channels'][$row->channel_id] = $row->channel_title;
+				$data["channels"][$row->channel_id] = $this->getChannelSettings($row->channel_id);
 			}
 		}
+		
+		$vars["data"] = $data;
+		
 		// Return the view.
 		return $EE->load->view('extension/settings', $vars, TRUE);
 	}
@@ -408,11 +412,11 @@ class Nsm_pp_workflow_ext
 	/**
 	 * Get the channel settings if the exist or load defaults
 	 *
-	 * @access private
+	 * @access public
 	 * @param int $channel_id The channel id
 	 * @return array the channel settings
 	 */
-	private function _channelSettings($channel_id){
+	public function getChannelSettings($channel_id){
 		return (isset($this->settings["channels"][$channel_id]))
 					? $this->settings["channels"][$channel_id]
 					: $this->_buildChannelSettings($channel_id);
@@ -491,7 +495,9 @@ class Nsm_pp_workflow_ext
 	 * @return array the settings unmodified
 	 */
 	private function _saveSettingsToSession($settings) {
-		$this->cache[SITE_ID]['settings'] = $settings;
+		$EE =& get_instance();
+		$EE->session->cache[$this->addon_id][SITE_ID]['settings'] = $settings;
+		$this->cache['settings'] = $settings;
 		return $settings;
 	}
 
