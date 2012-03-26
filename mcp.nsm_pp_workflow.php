@@ -138,9 +138,9 @@ class Nsm_pp_workflow_mcp{
 		
 		$EE =& get_instance();
 		// get the entries
-		$EE->db->select('channel_titles.entry_id, exp_members.email');
-		$EE->db->from('exp_members');
-		$EE->db->join('channel_titles', 'channel_titles.author_id = exp_members.member_id', 'left');
+		$EE->db->select('channel_titles.entry_id, members.email');
+		$EE->db->from('members');
+		$EE->db->join('channel_titles', 'channel_titles.author_id = members.member_id', 'left');
 		$EE->db->where_in('channel_titles.channel_id', $channel_ids);
 		$EE->db->where_in('channel_titles.entry_id', $entry_ids);
 		$entry_authors = $EE->db->get();
@@ -160,7 +160,7 @@ class Nsm_pp_workflow_mcp{
 		// load required libraries and prep template class
 		$EE->load->library('email');
 		$EE->load->library('template', false, 'TMPL');
-		$this->EE->TMPL->site_ids = array('1');
+		$this->EE->TMPL->site_ids = array($this->EE->config->item('site_id'));
 		// get data that can be used by templates from entry ids
 		$entries = $this->_returnEntries($entry_ids);
 		// find channels that need to email the entry author
@@ -194,7 +194,7 @@ class Nsm_pp_workflow_mcp{
 			$entry['entry_url'] = $EE->functions->create_url($entry['comment_url'].$entry['url_title']);
 			$entry['cp_entry_url'] = $EE->config->item('cp_url').
 										'?D=cp&C=content_publish&M=entry_form'.
-										'&channel_id='.$entry['entry_id'].'&entry_id='.$entry['channel_id'];
+										'&channel_id='.$entry['channel_id'].'&entry_id='.$entry['entry_id'];
 			
 			$emails_pending += count($email_recipients);
 			

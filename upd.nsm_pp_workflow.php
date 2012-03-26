@@ -73,7 +73,7 @@ class Nsm_pp_workflow_upd
 		// Install the model tables
 		if($this->models) {
 			foreach($this->models as $model) {
-				echo $model;
+//				echo $model;
 				require(dirname(__FILE__).'/models/'.strtolower($model).'.php');
 				if(method_exists("{$model}", "createTable")) {
 					call_user_func(array("{$model}", "createTable"));

@@ -212,19 +212,37 @@ class Nsm_pp_workflow_tab
 		$EE =& get_instance();
 		$EE->load->helper('date');
 		
+		$channel_id = $params['meta']['channel_id'];
+		$entry_id = $params['entry_id'];
+		
 		if(!class_exists('Nsm_pp_workflow_model')){
 			include(dirname(__FILE__).'/models/nsm_pp_workflow_model.php');
 		}
 		
-		$data = $params['mod_data']['nsm_pp_workflow'];
+		if(!class_exists('Nsm_pp_workflow_ext')){
+			include(dirname(__FILE__).'/ext.nsm_pp_workflow.php');
+		}
+		$nsm_pp_ext = new Nsm_pp_workflow_ext();
+		$settings = $nsm_pp_ext->settings;
+		// is this channel being managed by pp_workflow?
+		if( empty($settings['channels'][$channel_id]['enabled']) ){
+			return true;
+		}
 		
+		$default_data = array(
+			'state' => $settings['channels'][$channel_id]['state'],
+			'use_date' => 'est_next_review_date',
+			'est_next_review_date' => now() + ((60*60*24) * $settings['channels'][$channel_id]['next_review'])
+		);
 		
-		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($params['entry_id']);
+		$data = array_merge($default_data, $params['mod_data']['nsm_pp_workflow']);
+		
+		$nsm_pp_model = Nsm_pp_workflow_model::findByEntryId($entry_id);
 		// no existing entry? make one.
 		if(!$nsm_pp_model){
 			$model_data = array(
-				'entry_id' => $params['entry_id'],
-				'channel_id' => $params['meta']['channel_id'],
+				'entry_id' => $entry_id,
+				'channel_id' => $channel_id,
 				'entry_state' => $data['state'],
 				'last_review_date' => 0,
 				'next_review_date' => 0,
@@ -233,13 +251,13 @@ class Nsm_pp_workflow_tab
 			$nsm_pp_model = new Nsm_pp_workflow_model($model_data);
 			$nsm_pp_model->add();
 		}
-		
 		$new_review_date = $data[ $data['use_date'] ];
+		
 		if($data['use_date'] == 'new_review_date'){
 			$new_review_date = human_to_unix($new_review_date);
 		}
 		
-		$nsm_pp_model->channel_id = $params['meta']['channel_id'];
+		$nsm_pp_model->channel_id = $channel_id;
 		$nsm_pp_model->entry_state = $data['state'];
 		
 		if($data['use_date'] !== 'current_review_date'){

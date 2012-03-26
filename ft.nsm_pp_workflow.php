@@ -106,7 +106,7 @@ class Nsm_pp_workflow_ft extends EE_Fieldtype
 			$input_name = $this->field_name;
 		}
 
-		$this->_loadResources();
+		//$this->_loadResources();
 
 		$vars = array(
 			'EE' => $this->EE,
